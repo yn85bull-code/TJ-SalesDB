@@ -1,0 +1,12 @@
+node_modules/
+
+# Local browser profiles generated during visual checks.
+work/chrome-profile*/
+
+# Temporary browser/runtime cache files.
+*.log
+*.tmp
+
+# OS/editor noise.
+.DS_Store
+Thumbs.db

@@ -1,0 +1,1407 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>営業部ダッシュボード</title>
+
+  <style>
+    :root {
+      --bg: #f2f2f3;
+      --panel: #ffffff;
+      --text: #080808;
+      --muted: #666666;
+      --line: #101010;
+      --soft-line: #dddddd;
+      --red: #c90016;
+      --black: #080808;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Noto Sans JP", "Yu Gothic", "Meiryo", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--black);
+      color: var(--white);
+      border-right: 5px solid var(--red);
+      padding: 22px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar-logo {
+      font-size: 26px;
+      font-weight: 1000;
+      margin-bottom: 6px;
+      letter-spacing: .5px;
+    }
+
+    .sidebar-sub {
+      font-size: 11px;
+      color: #d7d7d7;
+      font-weight: 800;
+      margin-bottom: 28px;
+    }
+
+    .side-menu {
+      display: grid;
+      gap: 8px;
+    }
+
+    .side-menu button {
+      width: 100%;
+      height: 48px;
+      border: 2px solid #ffffff;
+      background: transparent;
+      color: #ffffff;
+      text-align: left;
+      padding: 0 14px;
+      border-radius: 6px;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .side-menu button.active {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .main-area {
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: 72px;
+      background: var(--black);
+      color: var(--white);
+      border-bottom: 4px solid var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+    }
+
+    .brand-block { display: flex; align-items: baseline; gap: 14px; }
+    .brand { font-size: 24px; font-weight: 950; }
+    .sub-brand { color: #d7d7d7; font-size: 12px; font-weight: 800; }
+    .toolbar { display: flex; gap: 10px; align-items: center; }
+
+    select, button {
+      height: 42px;
+      border: 2px solid var(--black);
+      border-radius: 4px;
+      padding: 0 12px;
+      background: var(--white);
+      color: var(--black);
+      font: inherit;
+      font-weight: 850;
+    }
+
+    button {
+      border-color: var(--red);
+      background: var(--red);
+      color: var(--white);
+      cursor: pointer;
+    }
+
+    .page { padding: 18px; max-width: 1920px; margin: 0 auto; }
+
+    .status {
+      color: var(--muted);
+      padding: 8px 2px 12px;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    .page-heading {
+      margin: 0 0 14px;
+      padding: 14px 16px;
+      background: #fff;
+      border: 3px solid var(--black);
+      border-left: 8px solid var(--red);
+      font-size: 20px;
+      font-weight: 1000;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.85fr 1.45fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .panel, .metric, .mini, .day, table {
+      background: var(--panel);
+      border: 3px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .panel { padding: 16px; }
+    .section { margin-top: 14px; }
+
+    .section-title {
+      margin: 0 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid var(--black);
+      font-size: 16px;
+      font-weight: 950;
+    }
+
+    .basic-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .basic-item {
+      border: 2px solid var(--black);
+      padding: 10px;
+      background: #fafafa;
+      min-height: 58px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.2;
+    }
+
+    .basic-item .value {
+      margin-top: 5px;
+      font-size: 18px;
+      font-weight: 950;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .g-card {
+      background: var(--white);
+      border: 5px solid var(--red);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 210px;
+    }
+
+    .g-card .label { color: var(--black); font-size: 18px; }
+
+    .g-card .value {
+      margin-top: 8px;
+      color: var(--black);
+      font-size: clamp(54px, 6vw, 104px);
+      font-weight: 1000;
+      line-height: 0.95;
+      overflow-wrap: anywhere;
+    }
+
+    .g-card .note {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .sub-metric {
+      border: 3px solid var(--black);
+      padding: 10px;
+      background: #fff;
+    }
+
+    .sub-metric b {
+      display: block;
+      margin-top: 4px;
+      font-size: 28px;
+      font-weight: 950;
+    }
+
+    .avg-grid { display: grid; gap: 10px; }
+
+    .avg-card {
+      min-height: 96px;
+      border: 4px solid var(--black);
+      padding: 12px;
+      background: #fff;
+    }
+
+    .avg-card.accent { border-color: var(--red); }
+
+    .avg-card .value {
+      margin-top: 6px;
+      font-size: 34px;
+      font-weight: 950;
+      color: var(--black);
+      line-height: 1;
+    }
+
+    .priority-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      min-height: 120px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric.big { border-width: 4px; min-height: 148px; }
+    .metric.red-border { border-color: var(--red); }
+
+    .metric .value {
+      font-size: 34px;
+      font-weight: 1000;
+      line-height: 1;
+      overflow-wrap: anywhere;
+    }
+
+    .metric.big .value { font-size: 46px; }
+
+    .red { color: var(--red); }
+    .black { color: var(--black); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+      gap: 10px;
+    }
+
+    .mini { padding: 11px; background: #fff; border-width: 2px; }
+    .mini b { display: block; font-size: 22px; margin-top: 5px; font-weight: 950; color: var(--black); }
+
+    .mini b.negative,
+    .metric .value.negative,
+    .sub-metric b.negative,
+    .avg-card .value.negative {
+      color: var(--red);
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 156px 1fr 96px;
+      gap: 10px;
+      align-items: center;
+      margin: 10px 0;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .bar-track {
+      height: 14px;
+      background: #eeeeee;
+      border: 2px solid var(--black);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .bar {
+      position: relative;
+      height: 100%;
+      width: 0;
+      background: var(--red);
+      transition: width 900ms cubic-bezier(.18,.86,.32,1);
+      overflow: hidden;
+    }
+
+    .bar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
+      transform: translateX(-120%);
+      animation: barShine 1.45s ease-in-out infinite;
+    }
+
+    .bar.black { background: var(--black); }
+
+    .rank-hero {
+      position: relative;
+      margin-bottom: 12px;
+      border: 5px solid transparent;
+      background:
+        linear-gradient(#fff, #fff) padding-box,
+        linear-gradient(120deg, #ff004c, #ffb000, #20d34a, #00a8ff, #7b2cff, #ff004c) border-box;
+      padding: 16px;
+      animation: rankGlow 1.6s ease-in-out infinite alternate;
+      overflow: hidden;
+    }
+
+    .rank-hero::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.95) 0 2px, transparent 3px),
+        radial-gradient(circle at 72% 24%, rgba(255,255,255,.9) 0 2px, transparent 3px),
+        radial-gradient(circle at 45% 70%, rgba(255,255,255,.95) 0 2px, transparent 3px),
+        conic-gradient(from 0deg, rgba(255,0,90,.25), rgba(255,190,0,.25), rgba(0,210,90,.25), rgba(0,160,255,.25), rgba(160,70,255,.25), rgba(255,0,90,.25));
+      animation: rainbowSpin 4s linear infinite;
+      pointer-events: none;
+    }
+
+    .rank-hero > * { position: relative; z-index: 1; }
+    .rank-hero .rank-label { font-size: 13px; font-weight: 950; color: var(--red); }
+    .rank-hero .rank-name { margin-top: 4px; font-size: 30px; font-weight: 1000; }
+
+    .rank-hero .rank-value {
+      margin-top: 8px;
+      font-size: 48px;
+      font-weight: 1000;
+      line-height: 1;
+      background: linear-gradient(90deg, #ff004c, #ffb000, #20d34a, #00a8ff, #7b2cff, #ff004c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      background-size: 240% 100%;
+      animation: rainbowText 2.2s linear infinite;
+    }
+
+    @keyframes barShine {
+      0% { transform: translateX(-120%); }
+      55%, 100% { transform: translateX(120%); }
+    }
+
+    @keyframes rankGlow {
+      from { box-shadow: 0 0 0 rgba(201,0,22,0); transform: translateY(0); }
+      to { box-shadow: 0 0 28px rgba(0,160,255,.35), 0 0 24px rgba(255,0,90,.28); transform: translateY(-2px); }
+    }
+
+    @keyframes rainbowSpin { to { transform: rotate(360deg); } }
+    @keyframes rainbowText { to { background-position: 240% 0; } }
+
+    .progress-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .progress-table th,
+    .progress-table td {
+      padding: 10px;
+      border-bottom: 2px solid var(--soft-line);
+      text-align: left;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .progress-table th {
+      color: var(--black);
+      background: #f7f7f7;
+      font-size: 12px;
+      font-weight: 950;
+      border-bottom: 3px solid var(--black);
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .day {
+      min-height: 92px;
+      padding: 9px;
+      border-width: 2px;
+    }
+
+    .day-head { font-weight: 950; margin-bottom: 6px; }
+    .day small { display: block; color: var(--muted); line-height: 1.55; font-weight: 750; }
+
+    .members, .stores { display: grid; gap: 12px; }
+
+    .store-group h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 950;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 2px solid var(--soft-line);
+      text-align: left;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--black);
+      background: #f6f6f6;
+      font-size: 12px;
+      font-weight: 950;
+      border-bottom: 3px solid var(--black);
+    }
+
+    .table-wrap { overflow: auto; }
+
+    @media (max-width: 1100px) {
+      .app-shell { display: block; }
+
+      .sidebar {
+        position: relative;
+        height: auto;
+        border-right: none;
+        border-bottom: 5px solid var(--red);
+      }
+
+      .side-menu {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .side-menu button {
+        text-align: center;
+      }
+
+      .hero, .priority-grid, .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .topbar {
+        height: auto;
+        min-height: 72px;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 12px;
+        flex-direction: column;
+      }
+
+      .page { padding: 10px; }
+      .calendar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">Tauros OS</div>
+      <div class="sidebar-sub">Sales Department Dashboard</div>
+
+      <div class="side-menu">
+        <button id="menu-home" class="active" onclick="switchView('home')">HOME</button>
+        <button id="menu-performance" onclick="switchView('performance')">実績管理</button>
+        <button id="menu-marketing" onclick="switchView('marketing')">集客情報管理</button>
+        <button id="menu-purchase" onclick="switchView('purchase')">買取本部</button>
+        <button id="menu-sales" onclick="switchView('sales')">販売本部</button>
+        
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <div class="topbar">
+        <div class="brand-block">
+          <div class="brand">営業部ダッシュボード</div>
+          <div class="sub-brand">G / MQ / F / Q Management</div>
+        </div>
+
+        <div class="toolbar">
+          <select id="deptSelect"></select>
+          <button onclick="refreshDashDb()">DASH更新</button>
+          <button onclick="loadDashboard()">再読み込み</button>
+        </div>
+      </div>
+
+      <main class="page">
+        <div class="status" id="status">読み込み中...</div>
+
+        <section id="view-home" class="view-section active">
+          <h1 class="page-heading">HOME</h1>
+
+          <section class="hero">
+            <div class="panel">
+              <h2 class="section-title">基本情報</h2>
+              <div class="basic-grid" id="basicInfo"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">重要平均@</h2>
+              <div class="avg-grid">
+                <div class="avg-card accent">
+                  <div class="label">AA@</div>
+                  <div class="value" id="aaAvg">0</div>
+                </div>
+                <div class="avg-card">
+                  <div class="label">販売@</div>
+                  <div class="value" id="salesAvg">0</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="g-card">
+              <div class="label">G / 営業利益</div>
+              <div class="value" id="mainG">0</div>
+              <div class="note">
+                <div class="sub-metric"><span class="label">売上</span><b id="mainSales">0</b></div>
+                <div class="sub-metric"><span class="label">MQ</span><b id="mainMq">0</b></div>
+                <div class="sub-metric"><span class="label">F</span><b id="mainF">0</b></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="priority-grid" id="priorityGrid"></section>
+        </section>
+
+        <section id="view-performance" class="view-section">
+          <h1 class="page-heading">実績管理</h1>
+
+          <section class="grid-3 section">
+            <div class="panel">
+              <h2 class="section-title">収益MQ内訳</h2>
+              <div id="revenueBars"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">F・経費内訳</h2>
+              <div id="expenseBars"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">スタッフ構成</h2>
+              <div class="mini-grid" id="staffGrid"></div>
+              <div id="staffBars"></div>
+            </div>
+          </section>
+
+          <section class="grid-2 section">
+            <div class="panel">
+              <h2 class="section-title">買取関連実績</h2>
+              <div class="mini-grid" id="purchaseGrid"></div>
+              <div id="purchaseTypeBars"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">AA応札詳細</h2>
+              <div class="mini-grid" id="aaGrid"></div>
+            </div>
+          </section>
+
+          <section class="grid-2 section">
+            <div class="panel">
+              <h2 class="section-title">販売関連実績</h2>
+              <div class="mini-grid" id="salesGrid"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">販売付帯</h2>
+              <div class="mini-grid" id="attachGrid"></div>
+            </div>
+          </section>
+
+          <section class="panel section">
+            <h2 class="section-title">目標進捗</h2>
+            <div id="progressTable"></div>
+          </section>
+
+          <section class="grid-2 section">
+            <div class="panel">
+              <h2 class="section-title">当月カレンダー</h2>
+              <div class="calendar" id="calendar"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">個人別MQランキング</h2>
+              <div id="memberRanking"></div>
+            </div>
+          </section>
+
+          <section class="grid-2 section">
+            <div class="panel">
+              <h2 class="section-title">営業部内 拠点実績</h2>
+              <div class="stores" id="stores"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">営業部内 個人実績</h2>
+              <div class="members" id="members"></div>
+            </div>
+          </section>
+        </section>
+
+        <section id="view-marketing" class="view-section">
+          <h1 class="page-heading">集客情報管理</h1>
+
+          <section class="grid-3 section">
+            <div class="panel">
+              <h2 class="section-title">総合サマリー</h2>
+              <div class="mini-grid" id="marketingSummary"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">媒体別予約</h2>
+              <div id="mediaReserveBars"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">媒体別契約</h2>
+              <div id="mediaContractBars"></div>
+            </div>
+          </section>
+
+          <section class="grid-2 section">
+            <div class="panel">
+              <h2 class="section-title">媒体別成約率</h2>
+              <div class="mini-grid" id="mediaRateGrid"></div>
+            </div>
+
+            <div class="panel">
+              <h2 class="section-title">エリア別予約・契約</h2>
+              <div id="areaBars"></div>
+            </div>
+          </section>
+        </section>
+        <section id="view-purchase" class="view-section">
+  <h1 class="page-heading">買取本部</h1>
+  <div class="toolbar" style="justify-content:flex-start;margin-bottom:12px;">
+  <button onclick="refreshPurchaseHqDashboard()">買取本部DASH更新</button>
+</div>
+
+  <section class="grid-3 section">
+    <div class="panel">
+      <h2 class="section-title">買取サマリー</h2>
+      <div class="mini-grid" id="purchaseHqSummary"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">査定・買取進捗</h2>
+      <div id="purchaseHqProgressBars"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">AA・販路管理</h2>
+      <div id="purchaseHqRouteBars"></div>
+    </div>
+  </section>
+
+  <section class="grid-2 section">
+    <div class="panel">
+      <h2 class="section-title">買取実績</h2>
+      <div class="mini-grid" id="purchaseHqKpi"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">媒体・予約管理</h2>
+      <div class="mini-grid" id="purchaseHqMedia"></div>
+    </div>
+  </section>
+</section>
+        <section id="view-sales" class="view-section">
+  <h1 class="page-heading">販売本部</h1>
+
+  <section class="grid-3 section">
+    <div class="panel">
+      <h2 class="section-title">販売在庫サマリー</h2>
+      <div class="mini-grid" id="salesStockSummary"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">在庫ステータス</h2>
+      <div id="salesStockBars"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">販売進捗</h2>
+      <div id="salesProgressBars"></div>
+    </div>
+  </section>
+
+  <section class="panel section">
+    <h2 class="section-title">店舗別在庫一覧</h2>
+    <div class="toolbar" style="justify-content:flex-start;margin-bottom:12px;">
+      <button onclick="refreshSalesDashboard()">販売本部DASH更新</button>
+      <button onclick="resetSalesHqMonthStart()">月初在庫を再設定</button>
+    </div>
+    <div class="table-wrap">
+      <table id="salesStockTable"></table>
+    </div>
+  </section>
+</section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    let currentDept = '';
+
+function switchView(view) {
+  const views = ['home', 'performance', 'marketing', 'purchase', 'sales'];
+
+  views.forEach(v => {
+    document.getElementById(`view-${v}`)?.classList.toggle('active', v === view);
+    document.getElementById(`menu-${v}`)?.classList.toggle('active', v === view);
+  });
+
+  if (view === 'purchase') {
+    loadPurchaseHqDashboard();
+  }
+
+  if (view === 'sales') {
+    loadSalesDashboard();
+  }
+}
+
+    function runGas(name, args) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)[name]
+          .apply(google.script.run, args || []);
+      });
+    }
+
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, s => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#039;'
+      }[s]));
+    }
+
+    function num(value) {
+      const n = Number(String(value || '').replace(/[¥￥,%\s]/g, ''));
+      return isNaN(n) ? 0 : n;
+    }
+
+    function fmt(value, type) {
+      if (String(value || '').includes('%')) return value;
+      if (type === 'rate') return value || '-';
+      if (type === 'q') return `${Number(num(value)).toLocaleString('ja-JP')}Q`;
+      return Number(num(value)).toLocaleString('ja-JP');
+    }
+
+    function valueClass(value) {
+      return num(value) < 0 ? 'negative' : 'black';
+    }
+
+    function formatCountValue(value, type, noSuffix) {
+      if (String(value || '').includes('%') || type === 'rate') return value || '-';
+      if (type === 'q' && !noSuffix) return `${Number(num(value)).toLocaleString('ja-JP')}Q`;
+      return Number(num(value)).toLocaleString('ja-JP');
+    }
+
+    function animateNumber(el, value, type, options = {}) {
+      if (!el) return;
+
+      el.classList.toggle('negative', num(value) < 0);
+
+      const finalValue = formatCountValue(value, type, options.noSuffix);
+      const target = num(value);
+
+      if (String(value || '').includes('%') || type === 'rate') {
+        el.textContent = finalValue;
+        return;
+      }
+
+      const duration = options.duration || 1050;
+      const start = performance.now();
+      const sign = target < 0 ? -1 : 1;
+      const absTarget = Math.abs(target);
+
+      function tick(now) {
+        const progress = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(absTarget * eased) * sign;
+
+        el.textContent = formatCountValue(current, type, options.noSuffix);
+
+        if (progress < 1) requestAnimationFrame(tick);
+        else el.textContent = finalValue;
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    function animateCountUps(root = document) {
+      root.querySelectorAll('[data-count-value]').forEach(el => {
+        animateNumber(el, el.dataset.countValue, el.dataset.countType || '', {
+          noSuffix: el.dataset.noSuffix === '1'
+        });
+      });
+    }
+
+    function animateBars() {
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.bar[data-width]').forEach(bar => {
+          bar.style.width = bar.dataset.width;
+        });
+      });
+    }
+
+    function calcAverage(total, count) {
+      const c = num(count);
+      if (!c) return 0;
+      return Math.round(num(total) / c);
+    }
+
+    function renderCards(rootId, rows) {
+      document.getElementById(rootId).innerHTML = Object.entries(rows || {}).map(([label, value]) => `
+        <div class="mini">
+          <span class="label">${esc(label)}</span>
+          <b class="${valueClass(value)}" data-count-value="${esc(value || 0)}">${esc(value || '0')}</b>
+        </div>
+      `).join('');
+
+      animateCountUps(document.getElementById(rootId));
+    }
+
+    function renderBars(rootId, rows, color = 'red') {
+      const entries = Array.isArray(rows)
+        ? rows
+        : Object.entries(rows || {}).map(([label, value]) => ({ label, value }));
+
+      const max = Math.max(1, ...entries.map(item => Math.abs(num(item.value))));
+
+      document.getElementById(rootId).innerHTML = entries.map((item, i) => `
+        <div class="bar-row">
+          <div>${esc(item.label)}</div>
+          <div class="bar-track">
+            <div class="bar ${color === 'black' || i % 2 ? 'black' : ''}" data-width="${Math.max(3, Math.min(100, Math.abs(num(item.value)) / max * 100))}%"></div>
+          </div>
+          <div class="${valueClass(item.value)}" data-count-value="${esc(item.value || 0)}">${esc(item.value || 0)}</div>
+        </div>
+      `).join('');
+
+      animateCountUps(document.getElementById(rootId));
+      animateBars();
+    }
+
+    async function init() {
+      const options = await runGas('getSalesDeptOptions');
+      const select = document.getElementById('deptSelect');
+
+      select.innerHTML = options.map(name => `<option>${esc(name)}</option>`).join('');
+
+      currentDept = options[0] || '';
+
+      select.onchange = () => {
+        currentDept = select.value;
+        loadDashboard();
+      };
+
+      await loadDashboard();
+    }
+
+    async function loadDashboard() {
+      document.getElementById('status').textContent = '読み込み中...';
+
+      const dept = currentDept || document.getElementById('deptSelect').value;
+
+      const [dash, daily, members, stores] = await Promise.all([
+        runGas('getSalesDeptDashboard', [dept]),
+        runGas('getSalesDeptDaily', [dept]),
+        runGas('getSalesDeptMembers', [dept]),
+        runGas('getSalesDeptStores', [dept])
+      ]);
+
+      currentDept = dash.selectedDept;
+
+      renderDashboard(dash, daily, members, stores);
+
+      document.getElementById('status').textContent =
+        `${dash.selectedDept} / ${dash.summary['対象月'] || ''} / 更新: ${dash.summary['更新日時'] || '-'}`;
+    }
+
+    async function refreshDashDb() {
+      document.getElementById('status').textContent = 'DASH DBを更新中...';
+
+      await runGas('buildSalesDeptDashboardAllDbs');
+      await loadDashboard();
+    }
+
+    function renderDashboard(dash, daily, members, stores) {
+      const s = dash.summary || {};
+      window.latestDashboardSummary = s;
+
+      document.getElementById('basicInfo').innerHTML = [
+        ['営業部', dash.selectedDept],
+        ['対象月', s['対象月']],
+        ['スタッフ数', s['スタッフ数']],
+        ['成約率', s['成約率']],
+        ['AA割合', s['AA割合']],
+        ['展示割合', s['展示割合']]
+      ].map(([label, value]) => `
+        <div class="basic-item">
+          <div class="label">${label}</div>
+          <div class="value">${esc(value || '-')}</div>
+        </div>
+      `).join('');
+
+      animateNumber(document.getElementById('mainG'), s['G'], 'money');
+      animateNumber(document.getElementById('mainSales'), s['売上'], 'money');
+      animateNumber(document.getElementById('mainMq'), s['トータルMQ'], 'money');
+      animateNumber(document.getElementById('mainF'), s['トータルF'], 'money');
+      animateNumber(document.getElementById('aaAvg'), s['AA@'] || s['AA平均粗利'], 'money');
+      animateNumber(document.getElementById('salesAvg'), calcAverage(s['販売純MQ'] || s['販売MQ'], s['販売台数実績'] || s['販売Q']), 'money');
+
+      const priorityRows = [
+        { label: '売上', value: s['売上'], type: 'money', big: true, red: true },
+        { label: 'MQ', value: s['トータルMQ'], type: 'money', big: true, red: true },
+        { label: 'F', value: s['トータルF'], type: 'money', big: true },
+        { label: '買取Q', value: s['買取台数実績'], type: 'q', noSuffix: true },
+        { label: '販売Q', value: s['販売台数実績'], type: 'q', noSuffix: true, red: true }
+      ];
+
+      document.getElementById('priorityGrid').innerHTML = priorityRows.map(row => `
+        <div class="metric ${row.big ? 'big' : ''} ${row.red ? 'red-border' : ''}">
+          <div class="label">${esc(row.label)}</div>
+          <div class="value ${valueClass(row.value)}" data-count-value="${esc(row.value || 0)}" data-count-type="${esc(row.type || '')}" data-no-suffix="${row.noSuffix ? '1' : '0'}">0</div>
+        </div>
+      `).join('');
+
+      animateCountUps(document.getElementById('priorityGrid'));
+
+      renderBars('revenueBars', dash.revenue, 'red');
+      renderBars('expenseBars', dash.expense, 'black');
+      renderCards('staffGrid', Object.fromEntries((dash.staff || []).map(x => [x.label, x.value])));
+      renderBars('staffBars', dash.staff, 'red');
+      renderCards('purchaseGrid', Object.fromEntries((dash.purchase || []).map(x => [x.label, x.value])));
+      renderBars('purchaseTypeBars', dash.purchaseTypes, 'black');
+      renderCards('aaGrid', Object.fromEntries((dash.aaBid || []).map(x => [x.label, x.value])));
+      renderCards('salesGrid', Object.fromEntries((dash.sales || []).map(x => [x.label, x.value])));
+      renderCards('attachGrid', Object.fromEntries((dash.attachments || []).map(x => [x.label, x.value])));
+      renderProgress(dash.progress || []);
+      renderCalendar(daily || []);
+      renderStores(stores || []);
+      renderMembers(members || []);
+      renderMarketing(s);
+    }
+
+    function renderMarketing(s) {
+      const summary = {
+        '総予約': s['総予約'],
+        '総契約': s['総契約'],
+        '総成約': s['総成約'],
+        'ナビクル率': s['ナビクル率'],
+        'モータ率': s['モータ率']
+      };
+
+      renderCards('marketingSummary', summary);
+
+      const mediaReserve = [
+        { label: 'ナビクル予約', value: s['ナビクル予約'] },
+        { label: 'モータ予約', value: s['モータ予約'] },
+        { label: '媒体C予約', value: s['媒体Ｃ予約'] || s['媒体C予約'] },
+        { label: '媒体D予約', value: s['媒体D予約'] },
+        { label: '媒体E予約', value: s['媒体E予約'] },
+        { label: '媒体F予約', value: s['媒体F予約'] }
+      ];
+
+      const mediaContract = [
+        { label: 'ナビクル契約', value: s['ナビクル契約'] },
+        { label: 'モータ契約', value: s['モータ契約'] },
+        { label: '媒体C契約', value: s['媒体Ｃ契約'] || s['媒体C契約'] },
+        { label: '媒体D契約', value: s['媒体D契約'] },
+        { label: '媒体E契約', value: s['媒体E契約'] },
+        { label: '媒体F契約', value: s['媒体F契約'] }
+      ];
+
+      const mediaRates = {
+        'ナビクル率': s['ナビクル率'],
+        'モータ率': s['モータ率'],
+        '媒体C率': s['媒体C率'],
+        '媒体D率': s['媒体D率'],
+        '媒体E率': s['媒体E率'],
+        '媒体F率': s['媒体F率']
+      };
+
+      const areas = [
+        { label: '東京予約', value: s['東京予約'] },
+        { label: '東京契約', value: s['東京契約'] },
+        { label: '千葉予約', value: s['千葉予約'] },
+        { label: '千葉契約', value: s['千葉契約'] },
+        { label: '埼玉予約', value: s['埼玉予約'] },
+        { label: '埼玉契約', value: s['埼玉契約'] },
+        { label: '神奈川予約', value: s['神奈川予約'] },
+        { label: '神奈川契約', value: s['神奈川契約'] },
+        { label: '茨城予約', value: s['茨城予約'] },
+        { label: '茨城契約', value: s['茨城契約'] },
+        { label: '大阪予約', value: s['大阪予約'] },
+        { label: '大阪契約', value: s['大阪契約'] },
+        { label: 'エリアG予約', value: s['エリアG予約'] },
+        { label: 'エリアG契約', value: s['エリアG契約'] },
+        { label: 'エリアH予約', value: s['エリアH予約'] },
+        { label: 'エリアH契約', value: s['エリアH契約'] },
+        { label: 'エリアI予約', value: s['エリアI予約'] },
+        { label: 'エリアI契約', value: s['エリアI契約'] },
+        { label: 'エリアJ予約', value: s['エリアJ予約'] },
+        { label: 'エリアJ契約', value: s['エリアJ契約'] }
+      ];
+
+      renderBars('mediaReserveBars', mediaReserve, 'red');
+      renderBars('mediaContractBars', mediaContract, 'black');
+      renderCards('mediaRateGrid', mediaRates);
+      renderBars('areaBars', areas, 'red');
+    }
+  async function loadPurchaseHqDashboard() {
+  document.getElementById('status').textContent = '買取本部データを読み込み中...';
+
+  const dept = currentDept || document.getElementById('deptSelect').value;
+  const data = await runGas('getPurchaseHqDashboard', [dept]);
+
+  renderPurchaseHqDashboard(data);
+
+  document.getElementById('status').textContent =
+    `買取本部 / ${data.selectedDept || '-'} / 更新完了`;
+}
+
+async function refreshPurchaseHqDashboard() {
+  document.getElementById('status').textContent = '買取本部DASHを更新中...';
+
+  await runGas('buildPurchaseHqDashboardDb');
+
+  await loadPurchaseHqDashboard();
+}
+
+function renderPurchaseHqDashboard(data) {
+  const s = data.summary || {};
+
+  renderCards('purchaseHqSummary', {
+    '査定Q': s['査定Q'],
+    '買取Q': s['買取Q'],
+    '成約CVR': s['成約CVR'],
+    '総予約': s['総予約'],
+    '総契約': s['総契約'],
+    '総成約': s['総成約']
+  });
+
+  renderBars('purchaseHqProgressBars', [
+    { label: '査定Q', value: s['査定Q'] },
+    { label: '買取Q', value: s['買取Q'] },
+    { label: 'AA処理Q', value: s['AA処理Q'] },
+    { label: 'AA未処理Q', value: s['AA未処理Q'] }
+  ], 'red');
+
+  renderBars('purchaseHqRouteBars', [
+    { label: 'AAQ', value: s['AAQ'] },
+    { label: '商品Q', value: s['商品Q'] },
+    { label: 'スクラップQ', value: s['スクラップQ'] },
+    { label: '代車Q', value: s['代車Q'] }
+  ], 'black');
+
+  renderCards('purchaseHqKpi', {
+    'AAMQ': s['AAMQ'],
+    'AA純MQ': s['AA純MQ'],
+    'AA@': s['AA@'],
+    'AA落札Q': s['AA落札Q'],
+    'AA流札Q': s['AA流札Q'],
+    'AA取消Q': s['AA取消Q'],
+    'AA翌月Q': s['AA翌月Q'],
+    'スクラップ粗利': s['スクラップ粗利']
+  });
+
+  renderCards('purchaseHqMedia', {
+    'ナビクル予約': s['ナビクル予約'],
+    'ナビクル契約': s['ナビクル契約'],
+    'ナビクル率': s['ナビクル率'],
+    'モータ予約': s['モータ予約'],
+    'モータ契約': s['モータ契約'],
+    'モータ率': s['モータ率'],
+    '媒体C予約': s['媒体C予約'],
+    '媒体C契約': s['媒体C契約'],
+    '媒体C率': s['媒体C率']
+  });
+}
+    async function loadSalesDashboard() {
+  document.getElementById('status').textContent = '販売本部データを読み込み中...';
+
+  const data = await runGas('getSalesHqDashboardData');
+
+  renderSalesDashboard(data);
+
+  document.getElementById('status').textContent =
+    `販売本部 / 更新: ${data.updatedAt || '-'}`;
+}
+
+async function refreshSalesDashboard() {
+  document.getElementById('status').textContent = '販売本部DASHを更新中...';
+
+  const data = await runGas('refreshSalesHqDashboardData');
+
+  renderSalesDashboard(data);
+
+  document.getElementById('status').textContent =
+    `販売本部 / 更新: ${data.updatedAt || '-'}`;
+}
+
+async function resetSalesHqMonthStart() {
+  document.getElementById('status').textContent = '月初在庫を再設定中...';
+
+  await runGas('resetSalesHqMonthStartStock');
+
+  await refreshSalesDashboard();
+}
+
+function renderSalesDashboard(data) {
+  const totals = data.totals || {};
+  const rows = data.rows || [];
+
+  renderCards('salesStockSummary', {
+    '合計在庫': totals.total,
+    '入庫前': totals.beforeArrival,
+    '未掲載': totals.notListed,
+    '展示中': totals.onDisplay,
+    '販売済': totals.sold,
+    '今月販売数': totals.soldThisMonth
+  });
+
+  renderBars('salesStockBars', [
+    { label: '入庫前', value: totals.beforeArrival },
+    { label: '未掲載', value: totals.notListed },
+    { label: '展示中', value: totals.onDisplay },
+    { label: '販売済', value: totals.sold }
+  ], 'red');
+
+  renderBars('salesProgressBars', [
+    { label: '月初在庫', value: totals.monthStartStock },
+    { label: '70%目標', value: totals.targetSales },
+    { label: '今月販売数', value: totals.soldThisMonth },
+    { label: '進捗率', value: totals.progressRate }
+  ], 'black');
+
+  document.getElementById('salesStockTable').innerHTML = `
+    <thead>
+      <tr>
+        <th>店舗</th>
+        <th>合計</th>
+        <th>入庫前</th>
+        <th>未掲載</th>
+        <th>展示中</th>
+        <th>販売済</th>
+        <th>明日</th>
+        <th>明後日</th>
+        <th>月初在庫</th>
+        <th>70%目標</th>
+        <th>今月販売数</th>
+        <th>進捗率</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(row => `
+        <tr>
+          <td>${esc(row.store)}</td>
+          <td>${esc(row.total)}</td>
+          <td>${esc(row.beforeArrival)}</td>
+          <td>${esc(row.notListed)}</td>
+          <td>${esc(row.onDisplay)}</td>
+          <td>${esc(row.sold)}</td>
+          <td>${esc(row.dateTomorrow)}</td>
+          <td>${esc(row.dateIn2Days)}</td>
+          <td>${esc(row.monthStartStock)}</td>
+          <td>${esc(row.targetSales)}</td>
+          <td>${esc(row.soldThisMonth)}</td>
+          <td>${esc(row.progressRate)}%</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  `;
+}
+
+    function renderProgress(rows) {
+      document.getElementById('progressTable').innerHTML = `
+        <table class="progress-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>目標</th>
+              <th>実績</th>
+              <th>進捗</th>
+              <th>差分</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(row => `
+              <tr>
+                <td>${esc(row.label)}</td>
+                <td>${row.target.toLocaleString('ja-JP')}</td>
+                <td>${row.actual.toLocaleString('ja-JP')}</td>
+                <td>
+                  <div class="bar-track">
+                    <div class="bar ${row.rate >= 100 ? 'black' : ''}" data-width="${Math.min(100, row.rate)}%"></div>
+                  </div>
+                  ${row.rate}%
+                </td>
+                <td class="${row.diff < 0 ? 'red' : 'black'}">${row.diff.toLocaleString('ja-JP')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      animateBars();
+    }
+
+    function renderCalendar(rows) {
+      document.getElementById('calendar').innerHTML = rows.map(row => `
+        <div class="day">
+          <div class="day-head">${esc(row['日付'])} ${esc(row['曜日'])}</div>
+          <small>査定 ${esc(row['査定件数'])} / 買取 ${esc(row['買取件数'])}</small>
+          <small>販売 ${esc(row['販売件数'])} / 契約 ${esc(row['契約件数'])}</small>
+          <small>CVR ${esc(row['買取成約CVR'])}</small>
+        </div>
+      `).join('') || '<div class="status">日別データがありません。</div>';
+    }
+
+    function renderMembers(rows) {
+      const sorted = [...rows].sort((a, b) => num(b['MQ']) - num(a['MQ']));
+      const top = sorted[0];
+
+      const rankingHtml = top ? `
+        <div class="rank-hero">
+          <div class="rank-label">MQ RANKING 1位</div>
+          <div class="rank-name">${esc(top['氏名'] || '-')}</div>
+          <div class="rank-value" data-count-value="${esc(top['MQ'] || 0)}">0</div>
+        </div>
+        <div id="memberRankingBars"></div>
+      ` : '<div class="status">個人別データがありません。</div>';
+
+      document.getElementById('memberRanking').innerHTML = rankingHtml;
+
+      if (top) {
+        animateCountUps(document.getElementById('memberRanking'));
+        renderBars('memberRankingBars', sorted.slice(1, 10).map(row => ({ label: row['氏名'], value: row['MQ'] })), 'red');
+      }
+
+      const groups = {};
+
+      rows.forEach(row => {
+        const store = row['拠点名'] || '未設定';
+        if (!groups[store]) groups[store] = [];
+        groups[store].push(row);
+      });
+
+      document.getElementById('members').innerHTML = Object.entries(groups).map(([store, list]) => `
+        <div class="store-group">
+          <h3>${esc(store)}</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>氏名</th>
+                  <th>役職</th>
+                  <th>ランク</th>
+                  <th>査定Q</th>
+                  <th>買取Q</th>
+                  <th>成約率</th>
+                  <th>MQ</th>
+                  <th>予約</th>
+                  <th>決裁</th>
+                  <th>MQ進捗</th>
+                  <th>MQ差分</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${list.map(row => `
+                  <tr>
+                    <td>${esc(row['氏名'])}</td>
+                    <td>${esc(row['役職'])}</td>
+                    <td>${esc(row['ランク'])}</td>
+                    <td>${esc(row['査定Q'])}</td>
+                    <td>${esc(row['買取Q'])}</td>
+                    <td>${esc(row['成約率'])}</td>
+                    <td>${esc(row['MQ'])}</td>
+                    <td>${esc(row['予約数'])}</td>
+                    <td>${esc(row['決裁数'])}</td>
+                    <td>${esc(row['MQ進捗'])}</td>
+                    <td>${esc(row['MQ差分'])}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderStores(rows) {
+      const sorted = [...rows].sort((a, b) => num(b['G']) - num(a['G']) || num(b['MQ']) - num(a['MQ']));
+
+      document.getElementById('stores').innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>拠点名</th>
+                <th>人数</th>
+                <th>売上</th>
+                <th>G</th>
+                <th>MQ</th>
+                <th>F</th>
+                <th>買取Q</th>
+                <th>販売Q</th>
+                <th>査定Q</th>
+                <th>成約率</th>
+                <th>固定費</th>
+                <th>人件費</th>
+                <th>広告費</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sorted.map(row => `
+                <tr>
+                  <td>${esc(row['店舗名'])}</td>
+                  <td>${esc(row['スタッフ数'] || 0)}</td>
+                  <td class="${valueClass(row['売上'])}">${esc(fmt(row['売上']))}</td>
+                  <td class="${valueClass(row['G'])}">${esc(fmt(row['G']))}</td>
+                  <td>${esc(fmt(row['MQ']))}</td>
+                  <td>${esc(fmt(row['F']))}</td>
+                  <td>${esc(fmt(row['買取Q'], 'q'))}</td>
+                  <td>${esc(fmt(row['販売Q'], 'q'))}</td>
+                  <td>${esc(fmt(row['査定Q'], 'q'))}</td>
+                  <td>${esc(row['成約率'] || '-')}</td>
+                  <td>${esc(fmt(row['固定費']))}</td>
+                  <td>${esc(fmt(row['人件費']))}</td>
+                  <td>${esc(fmt(row['広告費']))}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      ` || '<div class="status">拠点データがありません。</div>';
+    }
+
+    init().catch(err => {
+      document.getElementById('status').textContent = err.message || String(err);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,630 @@
+[
+  {
+    "index": 1,
+    "label": "営業部名"
+  },
+  {
+    "index": 2,
+    "label": "査定Ｑ"
+  },
+  {
+    "index": 3,
+    "label": "買取Ｑ"
+  },
+  {
+    "index": 4,
+    "label": "成約CVR"
+  },
+  {
+    "index": 5,
+    "label": "AA@"
+  },
+  {
+    "index": 6,
+    "label": "AAQ"
+  },
+  {
+    "index": 7,
+    "label": "商品Q"
+  },
+  {
+    "index": 8,
+    "label": "スクラップQ"
+  },
+  {
+    "index": 9,
+    "label": "代車Q"
+  },
+  {
+    "index": 10,
+    "label": "AA比率"
+  },
+  {
+    "index": 11,
+    "label": "商品比率"
+  },
+  {
+    "index": 12,
+    "label": "スクラップ比率"
+  },
+  {
+    "index": 13,
+    "label": "代車比率"
+  },
+  {
+    "index": 14,
+    "label": "当月AA出品Q"
+  },
+  {
+    "index": 15,
+    "label": "AA相違Q"
+  },
+  {
+    "index": 16,
+    "label": "AA相違比率"
+  },
+  {
+    "index": 17,
+    "label": "当月出品Q"
+  },
+  {
+    "index": 18,
+    "label": "当月出品比率"
+  },
+  {
+    "index": 19,
+    "label": "入庫平均日数"
+  },
+  {
+    "index": 20,
+    "label": "買取キャンセルQ"
+  },
+  {
+    "index": 21,
+    "label": "キャンセル比率"
+  },
+  {
+    "index": 22,
+    "label": "当月納車MQ"
+  },
+  {
+    "index": 23,
+    "label": "当月未納車MQ"
+  },
+  {
+    "index": 24,
+    "label": "翌月納車MQ"
+  },
+  {
+    "index": 25,
+    "label": "KB納車MQ"
+  },
+  {
+    "index": 26,
+    "label": "KB未納車MQ"
+  },
+  {
+    "index": 27,
+    "label": "当月付帯MQ"
+  },
+  {
+    "index": 28,
+    "label": "当月付帯未MQ"
+  },
+  {
+    "index": 29,
+    "label": "当月受注Ｑ"
+  },
+  {
+    "index": 30,
+    "label": "当月納車Ｑ"
+  },
+  {
+    "index": 31,
+    "label": "当月未納車Ｑ"
+  },
+  {
+    "index": 32,
+    "label": "当月受注納車Q"
+  },
+  {
+    "index": 33,
+    "label": "当月受注未納車Q"
+  },
+  {
+    "index": 34,
+    "label": "前月受注納車Q"
+  },
+  {
+    "index": 35,
+    "label": "前月受注未納車Q"
+  },
+  {
+    "index": 36,
+    "label": "翌月納車Ｑ"
+  },
+  {
+    "index": 37,
+    "label": "当月即納比率"
+  },
+  {
+    "index": 38,
+    "label": "納車Q前月比率"
+  },
+  {
+    "index": 39,
+    "label": "納車Q当月比率"
+  },
+  {
+    "index": 40,
+    "label": "クレジットQ"
+  },
+  {
+    "index": 41,
+    "label": "保証Q"
+  },
+  {
+    "index": 42,
+    "label": "メンテナンスQ"
+  },
+  {
+    "index": 43,
+    "label": "クリーニングQ"
+  },
+  {
+    "index": 44,
+    "label": "コーティングQ"
+  },
+  {
+    "index": 45,
+    "label": "エアコンQ"
+  },
+  {
+    "index": 46,
+    "label": "楽々納車Q"
+  },
+  {
+    "index": 47,
+    "label": "タイヤ交換Q"
+  },
+  {
+    "index": 48,
+    "label": "未来付帯Q"
+  },
+  {
+    "index": 49,
+    "label": "クレジット比率"
+  },
+  {
+    "index": 50,
+    "label": "保証比率"
+  },
+  {
+    "index": 51,
+    "label": "メンテナンス比率"
+  },
+  {
+    "index": 52,
+    "label": "クリーニング比率"
+  },
+  {
+    "index": 53,
+    "label": "コーティング比率"
+  },
+  {
+    "index": 54,
+    "label": "エアコン比率"
+  },
+  {
+    "index": 55,
+    "label": "楽々納車比率"
+  },
+  {
+    "index": 56,
+    "label": "タイヤ交換比率"
+  },
+  {
+    "index": 57,
+    "label": "未来比率"
+  },
+  {
+    "index": 58,
+    "label": "当月AAMQ"
+  },
+  {
+    "index": 59,
+    "label": "AA落札Q"
+  },
+  {
+    "index": 60,
+    "label": "AA未処理Q"
+  },
+  {
+    "index": 61,
+    "label": "AA流札Q"
+  },
+  {
+    "index": 62,
+    "label": "AA取消Q"
+  },
+  {
+    "index": 63,
+    "label": "AA翌月Q"
+  },
+  {
+    "index": 64,
+    "label": "スクラップ粗利"
+  },
+  {
+    "index": 65,
+    "label": "ナビクル予約"
+  },
+  {
+    "index": 66,
+    "label": "ナビクル契約"
+  },
+  {
+    "index": 67,
+    "label": "ナビクル率"
+  },
+  {
+    "index": 68,
+    "label": "モータ予約"
+  },
+  {
+    "index": 69,
+    "label": "モータ契約"
+  },
+  {
+    "index": 70,
+    "label": "モータ率"
+  },
+  {
+    "index": 71,
+    "label": "媒体Ｃ予約"
+  },
+  {
+    "index": 72,
+    "label": "媒体Ｃ契約"
+  },
+  {
+    "index": 73,
+    "label": "媒体C率"
+  },
+  {
+    "index": 74,
+    "label": "媒体D予約"
+  },
+  {
+    "index": 75,
+    "label": "媒体D契約"
+  },
+  {
+    "index": 76,
+    "label": "媒体D率"
+  },
+  {
+    "index": 77,
+    "label": "媒体E予約"
+  },
+  {
+    "index": 78,
+    "label": "媒体E契約"
+  },
+  {
+    "index": 79,
+    "label": "媒体E率"
+  },
+  {
+    "index": 80,
+    "label": "媒体F予約"
+  },
+  {
+    "index": 81,
+    "label": "媒体F契約"
+  },
+  {
+    "index": 82,
+    "label": "媒体F率"
+  },
+  {
+    "index": 83,
+    "label": "総予約"
+  },
+  {
+    "index": 84,
+    "label": "総契約"
+  },
+  {
+    "index": 85,
+    "label": "総成約"
+  },
+  {
+    "index": 86,
+    "label": "東京予約"
+  },
+  {
+    "index": 87,
+    "label": "東京契約"
+  },
+  {
+    "index": 88,
+    "label": "千葉予約"
+  },
+  {
+    "index": 89,
+    "label": "千葉契約"
+  },
+  {
+    "index": 90,
+    "label": "埼玉予約"
+  },
+  {
+    "index": 91,
+    "label": "埼玉契約"
+  },
+  {
+    "index": 92,
+    "label": "神奈川予約"
+  },
+  {
+    "index": 93,
+    "label": "神奈川契約"
+  },
+  {
+    "index": 94,
+    "label": "茨城予約"
+  },
+  {
+    "index": 95,
+    "label": "茨城契約"
+  },
+  {
+    "index": 96,
+    "label": "大阪予約"
+  },
+  {
+    "index": 97,
+    "label": "大阪契約"
+  },
+  {
+    "index": 98,
+    "label": "エリアG予約"
+  },
+  {
+    "index": 99,
+    "label": "エリアG契約"
+  },
+  {
+    "index": 100,
+    "label": "エリアH予約"
+  },
+  {
+    "index": 101,
+    "label": "エリアH契約"
+  },
+  {
+    "index": 102,
+    "label": "エリアI予約"
+  },
+  {
+    "index": 103,
+    "label": "エリアI契約"
+  },
+  {
+    "index": 104,
+    "label": "エリアJ予約"
+  },
+  {
+    "index": 105,
+    "label": "エリアJ契約"
+  },
+  {
+    "index": 106,
+    "label": "総契約数"
+  },
+  {
+    "index": 107,
+    "label": "MQ"
+  },
+  {
+    "index": 108,
+    "label": ""
+  },
+  {
+    "index": 109,
+    "label": ""
+  },
+  {
+    "index": 110,
+    "label": ""
+  },
+  {
+    "index": 111,
+    "label": ""
+  },
+  {
+    "index": 112,
+    "label": ""
+  },
+  {
+    "index": 113,
+    "label": ""
+  },
+  {
+    "index": 114,
+    "label": ""
+  },
+  {
+    "index": 115,
+    "label": ""
+  },
+  {
+    "index": 116,
+    "label": ""
+  },
+  {
+    "index": 117,
+    "label": ""
+  },
+  {
+    "index": 118,
+    "label": ""
+  },
+  {
+    "index": 119,
+    "label": "MOTA総数"
+  },
+  {
+    "index": 120,
+    "label": "MOTA総開示数"
+  },
+  {
+    "index": 121,
+    "label": "総開示率"
+  },
+  {
+    "index": 122,
+    "label": "MOTA直近総数"
+  },
+  {
+    "index": 123,
+    "label": "MOTA検討総数"
+  },
+  {
+    "index": 124,
+    "label": "MOTA顕在総数"
+  },
+  {
+    "index": 125,
+    "label": "直近開示"
+  },
+  {
+    "index": 126,
+    "label": "検討開示"
+  },
+  {
+    "index": 127,
+    "label": "顕在開示"
+  },
+  {
+    "index": 128,
+    "label": "直近開示率"
+  },
+  {
+    "index": 129,
+    "label": "検討開示率"
+  },
+  {
+    "index": 130,
+    "label": "顕在開示率"
+  },
+  {
+    "index": 131,
+    "label": "査定総数"
+  },
+  {
+    "index": 132,
+    "label": "査定率"
+  },
+  {
+    "index": 133,
+    "label": "成約総数"
+  },
+  {
+    "index": 134,
+    "label": "総成約率"
+  },
+  {
+    "index": 135,
+    "label": "総料金"
+  },
+  {
+    "index": 136,
+    "label": "開示情報成約率"
+  },
+  {
+    "index": 137,
+    "label": "情報成約率"
+  },
+  {
+    "index": 138,
+    "label": "即日査定"
+  },
+  {
+    "index": 139,
+    "label": "過去当日査定"
+  },
+  {
+    "index": 140,
+    "label": "過去後日査定"
+  },
+  {
+    "index": 141,
+    "label": "後日査定"
+  },
+  {
+    "index": 142,
+    "label": "即日査定成約"
+  },
+  {
+    "index": 143,
+    "label": "過去当日成約"
+  },
+  {
+    "index": 144,
+    "label": "過去後日成約"
+  },
+  {
+    "index": 145,
+    "label": "後日成約"
+  },
+  {
+    "index": 146,
+    "label": "即日査定比率"
+  },
+  {
+    "index": 147,
+    "label": "過去当日査定比率"
+  },
+  {
+    "index": 148,
+    "label": "過去後日査定比率"
+  },
+  {
+    "index": 149,
+    "label": "後日査定比率"
+  },
+  {
+    "index": 150,
+    "label": "即日成約比率"
+  },
+  {
+    "index": 151,
+    "label": "過去当日成約比率"
+  },
+  {
+    "index": 152,
+    "label": "過去後日成約比率"
+  },
+  {
+    "index": 153,
+    "label": "後日成約比率"
+  },
+  {
+    "index": 154,
+    "label": "即決契約数"
+  },
+  {
+    "index": 155,
+    "label": "管理契約数"
+  },
+  {
+    "index": 156,
+    "label": ""
+  },
+  {
+    "index": 157,
+    "label": ""
+  }
+]
