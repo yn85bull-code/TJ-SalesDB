@@ -1,0 +1,3494 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TJ-SalesDB</title>
+  <style>
+    :root {
+      --bg:#f6f7f9;
+      --panel:#ffffff;
+      --ink:#111318;
+      --muted:#6b7280;
+      --line:#e2e6ec;
+      --line-strong:#cfd5dd;
+      --red:#d9001b;
+      --red-dark:#a80015;
+      --red-soft:#fff0f3;
+      --green:#0a8f63;
+      --blue:#546e96;
+      --nav:#101614;
+      --shadow:0 14px 34px rgba(17,24,39,.08);
+      --soft-shadow:0 8px 22px rgba(17,24,39,.06);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; min-height:100%; }
+    body {
+      background:
+        radial-gradient(circle at 12% 8%, rgba(217,0,27,.055), transparent 32%),
+        linear-gradient(180deg,#fbfbfc 0%,var(--bg) 100%);
+      color:var(--ink);
+      font-family:"Noto Sans JP","Yu Gothic","Meiryo",system-ui,sans-serif;
+      font-weight:800;
+    }
+    button,select { font:inherit; }
+    .page { min-width:1380px; padding:22px 28px 28px; }
+    .top-brand {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:14px;
+    }
+    .brand-title {
+      font-size:34px;
+      line-height:1;
+      font-weight:1000;
+      letter-spacing:0;
+    }
+    .brand-title .red { color:var(--red); }
+    .brand-sub {
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+    }
+    .app-shell {
+      display:grid;
+      grid-template-columns:230px minmax(0,1fr);
+      gap:0;
+      max-width:1760px;
+      margin:0 auto;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:var(--panel);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .sidebar {
+      position:relative;
+      min-height:780px;
+      padding:28px 16px;
+      background:
+        radial-gradient(circle at 20% 8%, rgba(255,255,255,.08), transparent 28%),
+        linear-gradient(160deg,#151d1b 0%,#080b0a 64%,#121212 100%);
+      color:#fff;
+    }
+    .side-logo {
+      padding:0 8px 22px;
+      font-size:25px;
+      font-weight:1000;
+      letter-spacing:0;
+    }
+    .side-logo .red { color:var(--red); }
+    .nav {
+      display:grid;
+      gap:9px;
+    }
+    .nav-btn {
+      height:48px;
+      border:0;
+      border-radius:8px;
+      padding:0 14px;
+      background:transparent;
+      color:#f4f6f8;
+      text-align:left;
+      font-size:14px;
+      font-weight:1000;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .nav-btn:hover { background:rgba(255,255,255,.08); transform:translateX(3px); }
+    .nav-btn.active {
+      background:linear-gradient(135deg,var(--red) 0%,#b70017 62%,#ef3e4d 100%);
+      box-shadow:0 12px 24px rgba(217,0,27,.28);
+    }
+    .main {
+      min-width:0;
+      background:linear-gradient(180deg,#fff 0%,#fbfcfd 100%);
+    }
+    .app-header {
+      position:sticky;
+      top:0;
+      z-index:10;
+      display:grid;
+      grid-template-columns:minmax(280px,1fr) auto;
+      gap:18px;
+      align-items:center;
+      padding:24px 28px 18px;
+      border-bottom:1px solid var(--line);
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+    }
+    .selected-label {
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+    }
+    .dept-row {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:4px;
+    }
+    .dept-name {
+      font-size:30px;
+      font-weight:1000;
+      line-height:1.1;
+    }
+    .dept-select {
+      min-width:220px;
+      height:38px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:0 12px;
+      background:#fff;
+      color:var(--ink);
+    }
+    .header-actions {
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .pill {
+      height:38px;
+      display:inline-flex;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:0 12px;
+      background:#fff;
+      color:#374151;
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .update-btn {
+      height:38px;
+      border:0;
+      border-radius:8px;
+      padding:0 18px;
+      background:linear-gradient(135deg,var(--red),var(--red-dark));
+      color:#fff;
+      font-size:13px;
+      font-weight:1000;
+      cursor:pointer;
+      box-shadow:0 10px 22px rgba(217,0,27,.24);
+    }
+    .source-line {
+      flex-basis:100%;
+      text-align:right;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:800;
+      overflow-wrap:anywhere;
+    }
+    .content { padding:22px 28px 28px; }
+    .status {
+      margin:0 0 14px;
+      border:1px solid var(--line);
+      border-left:4px solid var(--red);
+      border-radius:10px;
+      padding:10px 12px;
+      background:#fff;
+      color:#3b4250;
+      font-size:12px;
+    }
+    .status.error { color:var(--red-dark); background:var(--red-soft); }
+    .view { display:none; }
+    .view.active { display:block; }
+    .section {
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+      box-shadow:var(--soft-shadow);
+      overflow:hidden;
+    }
+    .section-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px 10px;
+      border-bottom:1px solid var(--line);
+    }
+    .section-title {
+      color:var(--red);
+      font-size:15px;
+      font-weight:1000;
+    }
+    .section-more {
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+    }
+    .section-body { padding:14px 16px 16px; }
+    .grid { display:grid; gap:14px; }
+    .g2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .g3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .g4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .g5 { grid-template-columns:repeat(5,minmax(0,1fr)); }
+    .g6 { grid-template-columns:repeat(6,minmax(0,1fr)); }
+    .g7 { grid-template-columns:repeat(7,minmax(0,1fr)); }
+    .kpi-card,
+    .mini-card,
+    .panel-card {
+      position:relative;
+      min-width:0;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:0 8px 20px rgba(17,24,39,.055);
+      overflow:hidden;
+    }
+    .kpi-card {
+      min-height:178px;
+      padding:18px;
+    }
+    .kpi-card.wide-spark .spark {
+      left:0;
+      right:0;
+      bottom:0;
+      height:70px;
+    }
+    .kpi-card::after {
+      content:"";
+      position:absolute;
+      right:16px;
+      top:16px;
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      background:var(--red-soft);
+    }
+    .kpi-icon {
+      position:absolute;
+      right:16px;
+      top:16px;
+      z-index:2;
+      width:44px;
+      height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:50%;
+      color:var(--red);
+      font-size:21px;
+      font-weight:1000;
+    }
+    .kpi-icon svg {
+      width:24px;
+      height:24px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2.4;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+    .kpi-title,
+    .mini-title {
+      position:relative;
+      z-index:1;
+      color:#111827;
+      font-size:13px;
+      font-weight:1000;
+      letter-spacing:0;
+    }
+    .kpi-value {
+      position:relative;
+      z-index:1;
+      margin-top:22px;
+      font-size:22px;
+      line-height:1;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .kpi-sub {
+      margin-top:12px;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+    }
+    .up { color:var(--green); }
+    .spark {
+      position:absolute;
+      left:14px;
+      right:14px;
+      bottom:8px;
+      height:44px;
+      opacity:.88;
+    }
+    .spark path[stroke],
+    .trend-spark path[stroke] {
+      stroke-dasharray:420;
+      stroke-dashoffset:420;
+      animation:drawLine 1.25s cubic-bezier(.16,1,.3,1) forwards;
+    }
+    .spark path[fill],
+    .trend-spark path[fill] {
+      opacity:0;
+      animation:fadeArea .9s ease .25s forwards;
+    }
+    .mini-card {
+      min-height:118px;
+      padding:16px;
+    }
+    .mini-value {
+      margin-top:18px;
+      font-size:23px;
+      line-height:1;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .mini-sub {
+      margin-top:12px;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+    }
+    .highlight {
+      border-color:#f5a7b1;
+      background:linear-gradient(135deg,#fff 0%,#fff8f9 100%);
+    }
+    .panel-card { padding:14px; }
+    .home-purchase-card {
+      display:grid;
+      gap:12px;
+      min-height:760px;
+      height:100%;
+      grid-template-rows:38px 210px repeat(5,minmax(0,auto));
+      align-content:start;
+    }
+    .home-purchase-card .panel-head {
+      height:38px;
+      margin:0;
+      padding:0;
+      border-bottom:0;
+      align-items:center;
+    }
+    .panel-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .panel-title { font-size:15px; font-weight:1000; }
+    .panel-link { color:var(--muted); font-size:11px; font-weight:900; }
+    .panel-number {
+      font-size:24px;
+      line-height:1;
+      font-weight:1000;
+      margin:8px 0 8px;
+    }
+    .metric-row {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin:0;
+      min-height:36px;
+    }
+    .purchase-main-block {
+      position:relative;
+      min-height:210px;
+      height:210px;
+      border:1px solid #f0c4cb;
+      border-radius:10px;
+      padding:14px 14px 12px;
+      background:linear-gradient(135deg,#fff 0%,#fff7f8 100%);
+      overflow:hidden;
+      display:grid;
+      grid-template-rows:20px 40px 1fr;
+      align-items:start;
+    }
+    .purchase-main-block .mini-title {
+      margin:0;
+      line-height:18px;
+    }
+    .metric-main {
+      font-size:24px;
+      line-height:1;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .trend-chip {
+      border-radius:999px;
+      padding:5px 9px;
+      background:#edfdf6;
+      color:var(--green);
+      font-size:11px;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .trend-spark {
+      display:block;
+      width:100%;
+      height:136px;
+      margin-top:0;
+    }
+    .sub-block {
+      border-top:1px solid var(--line);
+      padding-top:11px;
+    }
+    .sub-block-title {
+      color:var(--red);
+      font-size:12px;
+      font-weight:1000;
+      margin-bottom:8px;
+    }
+    .compact-pair {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+    .compact-metric {
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:9px;
+      background:#fbfcfd;
+    }
+    .compact-label {
+      color:var(--muted);
+      font-size:10px;
+      font-weight:900;
+    }
+    .compact-value {
+      margin-top:5px;
+      font-size:18px;
+      line-height:1;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .aa-revenue-block .compact-value {
+      font-size:14px;
+      letter-spacing:0;
+    }
+    .donut-layout {
+      display:grid;
+      grid-template-columns:86px minmax(0,1fr);
+      gap:12px;
+      align-items:center;
+    }
+    .donut {
+      width:86px;
+      height:86px;
+      border-radius:50%;
+      background:conic-gradient(var(--red) 0deg, var(--red) 120deg, #111 120deg, #111 210deg, #5d7fa8 210deg, #5d7fa8 280deg, #c7ced8 280deg, #c7ced8 360deg);
+      position:relative;
+      box-shadow:inset 0 0 0 1px var(--line);
+      animation:donutIn .85s cubic-bezier(.16,1,.3,1) both;
+    }
+    .donut::after {
+      content:"";
+      position:absolute;
+      inset:22px;
+      border-radius:50%;
+      background:#fff;
+      box-shadow:0 0 0 1px var(--line);
+    }
+    .donut-legend {
+      display:grid;
+      gap:6px;
+      font-size:11px;
+      font-weight:900;
+    }
+    .legend-row {
+      display:grid;
+      grid-template-columns:10px 1fr auto;
+      gap:7px;
+      align-items:center;
+      min-width:0;
+    }
+    .legend-swatch {
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--red);
+    }
+    .legend-swatch.black { background:#111; }
+    .legend-swatch.blue { background:#5d7fa8; }
+    .legend-swatch.gray { background:#c7ced8; }
+    .goal-bars {
+      height:100%;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      align-items:end;
+      padding-top:4px;
+    }
+    .goal-bar-item {
+      min-width:0;
+      display:grid;
+      grid-template-rows:18px 1fr 16px;
+      gap:4px;
+      height:100%;
+      text-align:center;
+    }
+    .goal-bar-value {
+      color:#111827;
+      font-size:11px;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .goal-bar-track {
+      align-self:end;
+      height:100%;
+      min-height:70px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      border-radius:8px;
+      background:#f2f4f7;
+      overflow:hidden;
+    }
+    .goal-bar-fill {
+      width:100%;
+      min-height:5%;
+      border-radius:8px 8px 0 0;
+      background:linear-gradient(180deg,#ef4050 0%,#d9001b 100%);
+      transform-origin:bottom;
+      animation:barGrow .85s cubic-bezier(.16,1,.3,1) both;
+    }
+    .goal-bar-label {
+      color:var(--muted);
+      font-size:10px;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .goal-progress-list {
+      display:grid;
+      gap:9px;
+    }
+    .goal-progress-item {
+      display:grid;
+      gap:5px;
+    }
+    .goal-progress-head {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      font-size:11px;
+      font-weight:1000;
+    }
+    .goal-progress-bar {
+      position:relative;
+      height:25px;
+      border-radius:999px;
+      background:#eef1f5;
+      overflow:hidden;
+    }
+    .goal-progress-fill {
+      position:absolute;
+      inset:0 auto 0 0;
+      width:0;
+      border-radius:inherit;
+      background:linear-gradient(90deg,#d9001b,#f35a67);
+      transition:width .9s cubic-bezier(.16,1,.3,1);
+    }
+    .goal-progress-text {
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 8px;
+      color:#111827;
+      font-size:10px;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    @keyframes barGrow {
+      from { transform:scaleY(0); }
+      to { transform:scaleY(1); }
+    }
+    @keyframes drawLine {
+      to { stroke-dashoffset:0; }
+    }
+    @keyframes fadeArea {
+      to { opacity:1; }
+    }
+    @keyframes donutIn {
+      from { transform:rotate(-50deg) scale(.82); opacity:.15; }
+      to { transform:rotate(0deg) scale(1); opacity:1; }
+    }
+    .bar {
+      height:13px;
+      border-radius:999px;
+      background:#f0f2f5;
+      overflow:hidden;
+    }
+    .fill {
+      height:100%;
+      width:0;
+      border-radius:inherit;
+      background:linear-gradient(90deg,var(--red),#f35a67);
+      transition:width .9s cubic-bezier(.16,1,.3,1);
+    }
+    .purchase-detail-page {
+      display:grid;
+      gap:16px;
+    }
+    .purchase-detail-hero {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+    }
+    .purchase-detail-layout {
+      display:grid;
+      grid-template-columns:1.15fr .95fr;
+      gap:16px;
+      align-items:start;
+    }
+    .purchase-detail-stack {
+      display:grid;
+      gap:16px;
+    }
+    .detail-block {
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      box-shadow:var(--soft-shadow);
+      overflow:hidden;
+    }
+    .detail-block-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:13px 15px 9px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(135deg,#fff 0%,#fff3f5 100%);
+    }
+    .detail-block-title {
+      color:var(--red);
+      font-size:14px;
+      font-weight:1000;
+    }
+    .detail-block-sub {
+      color:var(--muted);
+      font-size:10px;
+      font-weight:1000;
+    }
+    .detail-block-body {
+      padding:14px;
+    }
+    .detail-metric-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    .detail-metric-grid.g4 {
+      grid-template-columns:repeat(4,minmax(0,1fr));
+    }
+    .detail-metric {
+      min-height:92px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:12px;
+      background:linear-gradient(135deg,#fff 0%,#fbfcfd 100%);
+    }
+    .detail-metric.hot {
+      border-color:#f3a7b1;
+      background:linear-gradient(135deg,#fff 0%,#fff2f4 100%);
+    }
+    .detail-label {
+      color:var(--muted);
+      font-size:11px;
+      font-weight:1000;
+    }
+    .detail-value {
+      margin-top:8px;
+      font-size:25px;
+      line-height:1;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .detail-value.small {
+      font-size:19px;
+    }
+    .detail-chart-row {
+      display:grid;
+      grid-template-columns:120px minmax(0,1fr) 96px;
+      gap:10px;
+      align-items:center;
+      margin-top:10px;
+      font-size:11px;
+      font-weight:1000;
+    }
+    .detail-line-card {
+      min-height:190px;
+      border:1px solid #f0c4cb;
+      border-radius:12px;
+      padding:14px;
+      background:linear-gradient(135deg,#fff 0%,#fff7f8 100%);
+      overflow:hidden;
+    }
+    .detail-line-card .trend-spark {
+      height:118px;
+      margin-top:4px;
+    }
+    .dual-chart-card {
+      border:1px solid #f0c4cb;
+      border-radius:12px;
+      padding:12px 14px 10px;
+      background:linear-gradient(135deg,#fff 0%,#fff7f8 100%);
+      overflow:hidden;
+    }
+    .dual-chart-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:8px;
+    }
+    .dual-chart-title {
+      font-size:12px;
+      font-weight:1000;
+      color:var(--red);
+    }
+    .dual-chart-legend {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:#111827;
+      font-size:11px;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .dual-chart-legend i {
+      display:inline-block;
+      width:18px;
+      height:4px;
+      border-radius:999px;
+      margin-right:5px;
+      vertical-align:middle;
+    }
+    .dual-chart-legend .red-line { background:var(--red); }
+    .dual-chart-legend .blue-line { background:var(--blue); }
+    .dual-line-chart {
+      display:block;
+      width:100%;
+      height:208px;
+    }
+    .dual-line-chart .grid-lines line {
+      stroke:#e7ebf0;
+      stroke-width:1;
+    }
+    .dual-area {
+      opacity:.9;
+    }
+    .dual-area.purchase { fill:url(#dualPurchaseFill); }
+    .dual-area.assessment { fill:url(#dualAssessmentFill); }
+    .dual-area.sales { fill:url(#dualSalesFill); }
+    .dual-area.dispatch { fill:url(#dualDispatchFill); }
+    .dual-area.marketing { fill:url(#marketingInfoFill); }
+    .dual-line {
+      fill:none;
+      stroke-width:4;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      stroke-dasharray:900;
+      stroke-dashoffset:900;
+      animation:drawLine 1.1s cubic-bezier(.16,1,.3,1) forwards;
+    }
+    .dual-line.purchase { stroke:var(--red); }
+    .dual-line.assessment {
+      stroke:var(--blue);
+      animation-delay:.12s;
+    }
+    .dual-line.sales { stroke:var(--red); }
+    .dual-line.dispatch {
+      stroke:var(--blue);
+      animation-delay:.12s;
+    }
+    .dual-dots.purchase circle { fill:var(--red); }
+    .dual-dots.assessment circle { fill:var(--blue); }
+    .dual-dots.sales circle { fill:var(--red); }
+    .dual-dots.dispatch circle { fill:var(--blue); }
+    .chart-point {
+      cursor:pointer;
+      pointer-events:all;
+      stroke:#fff;
+      stroke-width:2;
+    }
+    .chart-tooltip {
+      position:fixed;
+      z-index:9999;
+      display:none;
+      min-width:120px;
+      max-width:220px;
+      padding:8px 10px;
+      border-radius:8px;
+      background:#111318;
+      color:#fff;
+      font-size:12px;
+      font-weight:1000;
+      line-height:1.35;
+      box-shadow:0 12px 28px rgba(17,24,39,.22);
+      pointer-events:none;
+      transform:translate(12px,-12px);
+      white-space:pre-line;
+    }
+    .dual-xlabels text {
+      fill:var(--muted);
+      font-size:10px;
+      font-weight:1000;
+    }
+    .dual-axis-note {
+      margin-top:4px;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:900;
+      text-align:right;
+    }
+    .timing-bars {
+      display:grid;
+      gap:11px;
+    }
+    .timing-bar-row {
+      display:grid;
+      grid-template-columns:86px minmax(0,1fr) 84px;
+      gap:10px;
+      align-items:center;
+      font-size:11px;
+      font-weight:1000;
+    }
+    .timing-value {
+      text-align:right;
+      white-space:nowrap;
+    }
+    .aa-wide {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+    .sales-wide {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    .accessory-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    .accessory-card {
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px;
+      background:#fbfcfd;
+    }
+    .accessory-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      font-size:11px;
+      font-weight:1000;
+    }
+    .accessory-values {
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:8px;
+      margin-top:7px;
+      font-size:12px;
+      font-weight:1000;
+    }
+    .accessory-mq {
+      color:var(--red);
+    }
+    .triple-compare {
+      display:grid;
+      gap:12px;
+    }
+    .triple-compare-item {
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:12px;
+      background:#fbfcfd;
+    }
+    .triple-head {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:12px;
+      font-weight:1000;
+      margin-bottom:8px;
+    }
+    .triple-row {
+      display:grid;
+      grid-template-columns:58px minmax(0,1fr) 84px;
+      gap:9px;
+      align-items:center;
+      margin-top:6px;
+      font-size:10px;
+      font-weight:1000;
+    }
+    .triple-row .bar {
+      height:11px;
+    }
+    .profile-list {
+      display:grid;
+      gap:10px;
+    }
+    .profile-row {
+      display:grid;
+      grid-template-columns:132px minmax(0,1fr);
+      gap:12px;
+      align-items:start;
+      padding:10px 0;
+      border-bottom:1px solid var(--line);
+      font-size:13px;
+      font-weight:1000;
+    }
+    .profile-row:last-child { border-bottom:0; }
+    .profile-label {
+      color:var(--muted);
+      font-size:11px;
+    }
+    .profile-value {
+      color:var(--ink);
+      overflow-wrap:anywhere;
+    }
+    .basic-hero {
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    .productivity-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    .alert-grid {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+    }
+    .alert-card {
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:12px;
+      background:#fff;
+      min-height:92px;
+    }
+    .alert-card.great { border-color:#9bb9ff; background:linear-gradient(135deg,#fff,#f1f6ff); }
+    .alert-card.nice { border-color:#a9dfc9; background:linear-gradient(135deg,#fff,#f0fff8); }
+    .alert-card.danger { border-color:#f2d276; background:linear-gradient(135deg,#fff,#fff9e8); }
+    .alert-card.catastrophe { border-color:#f3a7b1; background:linear-gradient(135deg,#fff,#fff1f3); }
+    .alert-label {
+      font-size:11px;
+      font-weight:1000;
+      color:var(--muted);
+    }
+    .alert-value {
+      margin-top:7px;
+      font-size:20px;
+      font-weight:1000;
+      line-height:1;
+    }
+    .target-detail-grid {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+    }
+    .personal-card-grid {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+    .personal-kpi-list {
+      display:grid;
+      gap:9px;
+    }
+    .personal-kpi-row {
+      display:grid;
+      grid-template-columns:34px minmax(0,1.2fr) repeat(6,minmax(64px,.7fr));
+      gap:8px;
+      align-items:center;
+      padding:9px 10px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:#fff;
+      font-size:11px;
+      font-weight:1000;
+    }
+    .personal-name {
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .personal-meta {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      margin-top:3px;
+      min-width:0;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:900;
+    }
+    .personal-meta-text {
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .role-badge {
+      display:inline-flex;
+      align-items:center;
+      max-width:88px;
+      padding:2px 7px;
+      border-radius:999px;
+      border:1px solid #d7dce5;
+      color:#232a35;
+      background:#f7f8fa;
+      font-size:10px;
+      font-weight:1000;
+      line-height:1.25;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .role-badge.manager {
+      background:#eaf8ef;
+      border-color:#9ad7ae;
+      color:#176b33;
+    }
+    .role-badge.purchase {
+      background:#fff0f5;
+      border-color:#f4a6bd;
+      color:#a91242;
+    }
+    .role-badge.sales {
+      background:#eef6ff;
+      border-color:#9fc9f2;
+      color:#165f9f;
+    }
+    .calendar-summary-grid {
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:12px;
+    }
+    .calendar-timeline {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+    }
+    .calendar-timeline-row {
+      display:grid;
+      grid-template-columns:54px 34px repeat(5,minmax(58px,1fr));
+      gap:7px;
+      align-items:center;
+      min-height:42px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      padding:7px 9px;
+      background:#fff;
+      font-size:11px;
+      font-weight:1000;
+    }
+    .calendar-timeline-row.sat { background:#f0f8ff; border-color:#b9dcff; }
+    .calendar-timeline-row.sun { background:#fff1f6; border-color:#ffc3d5; }
+    .calendar-timeline-row.today { border-color:var(--red); box-shadow:0 0 0 2px rgba(217,0,27,.08) inset; }
+    .calendar-mini-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+    .fill.black { background:linear-gradient(90deg,#111,#4b5563); }
+    .fill.blue { background:linear-gradient(90deg,#5d7fa8,#233957); }
+    .fill.gray { background:linear-gradient(90deg,#c7ced8,#8d99a8); }
+    .fill.green { background:linear-gradient(90deg,#12a66f,#08724d); }
+    .ratio-row {
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:center;
+      margin-top:9px;
+      font-size:12px;
+      font-weight:900;
+    }
+    .stack {
+      display:flex;
+      height:16px;
+      overflow:hidden;
+      border-radius:999px;
+      background:#f0f2f5;
+    }
+    .seg { width:0; transition:width .9s cubic-bezier(.16,1,.3,1); }
+    .seg.red { background:var(--red); }
+    .seg.black { background:#111; }
+    .seg.blue { background:#5d7fa8; }
+    .seg.gray { background:#c7ced8; }
+    .table-wrap {
+      max-height:360px;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+    }
+    table { width:100%; min-width:760px; border-collapse:collapse; }
+    th,td {
+      padding:9px 10px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    th {
+      position:sticky;
+      top:0;
+      z-index:1;
+      background:#fbfcfd;
+      color:#4b5563;
+      font-size:11px;
+    }
+    .ranking-table { width:100%; min-width:0; }
+    .ranking-table th,.ranking-table td { font-size:12px; }
+    .rank-badge {
+      display:inline-flex;
+      width:22px;
+      height:22px;
+      align-items:center;
+      justify-content:center;
+      border-radius:50%;
+      background:#eef1f5;
+      color:#111;
+      font-size:11px;
+      font-weight:1000;
+    }
+    .rank-badge.top { background:#f6bd16; color:#fff; }
+    .rank-badge.second { background:#aeb6c2; color:#fff; }
+    .rank-badge.third { background:#c9782f; color:#fff; }
+    .home-ranking-card {
+      display:grid;
+      gap:10px;
+      min-height:760px;
+      height:100%;
+      grid-template-rows:38px repeat(3,minmax(0,1fr));
+      align-content:start;
+    }
+    .home-ranking-card .panel-head {
+      height:38px;
+      margin:0;
+      padding:0;
+      border-bottom:0;
+      align-items:center;
+    }
+    .home-rank-block {
+      border-top:1px solid var(--line);
+      padding-top:9px;
+    }
+    .home-rank-block:first-of-type {
+      border-top:0;
+      padding-top:0;
+    }
+    .home-rank-title {
+      color:var(--red);
+      font-size:12px;
+      font-weight:1000;
+      margin-bottom:6px;
+    }
+    .home-rank-row {
+      display:grid;
+      grid-template-columns:26px minmax(0,1fr) auto;
+      gap:8px;
+      align-items:center;
+      min-height:28px;
+      font-size:11px;
+      font-weight:900;
+    }
+    .home-rank-name {
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .home-rank-score {
+      white-space:nowrap;
+      color:#111827;
+      font-weight:1000;
+    }
+    .calendar-list {
+      display:grid;
+      gap:5px;
+      height:100%;
+      max-height:100%;
+      overflow-y:auto;
+      align-content:start;
+      padding-right:3px;
+    }
+    .calendar-row {
+      display:grid;
+      grid-template-columns:36px 18px minmax(48px,.8fr) minmax(48px,.8fr) minmax(64px,1fr);
+      gap:3px;
+      align-items:center;
+      min-height:0;
+      height:27px;
+      padding:5px 4px;
+      border:1px solid var(--line);
+      border-radius:7px;
+      background:#fff;
+      font-size:8.8px;
+      font-weight:1000;
+    }
+    .calendar-row.today {
+      border-color:#f5a7b1;
+      background:#fff5f7;
+    }
+    .calendar-date {
+      color:#111827;
+      white-space:nowrap;
+      font-size:8.8px;
+    }
+    .calendar-weekday {
+      color:var(--red);
+      text-align:center;
+      font-size:8.8px;
+    }
+    .calendar-kpi {
+      color:#374151;
+      white-space:nowrap;
+      font-size:8px;
+      letter-spacing:0;
+    }
+    .calendar-card {
+      grid-template-rows:38px 1fr;
+    }
+    .calendar-card .sub-block {
+      height:100%;
+      display:grid;
+    }
+    .target-compact-card {
+      grid-template-rows:38px minmax(0,1fr);
+    }
+    .target-personal-layout {
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      gap:11px;
+      height:100%;
+      min-height:0;
+    }
+    .target-compact-list {
+      display:grid;
+      gap:4px;
+    }
+    .target-compact-list .goal-progress-item {
+      gap:3px;
+    }
+    .target-compact-list .goal-progress-bar {
+      height:18px;
+    }
+    .target-compact-list .goal-progress-head {
+      font-size:10px;
+    }
+    .target-compact-list .goal-progress-text {
+      font-size:9px;
+    }
+    .target-rank-grid {
+      display:grid;
+      gap:14px;
+      align-content:stretch;
+      min-height:0;
+      height:100%;
+    }
+    .target-rank-grid .home-rank-block {
+      padding-top:10px;
+      display:grid;
+      grid-template-rows:auto repeat(3,1fr);
+      min-height:0;
+    }
+    .target-rank-grid .home-rank-row {
+      min-height:38px;
+      font-size:12px;
+    }
+    .target-rank-grid .rank-badge {
+      width:25px;
+      height:25px;
+      font-size:12px;
+    }
+    .target-rank-grid .home-rank-title {
+      font-size:13px;
+      margin-bottom:8px;
+    }
+    .target-ranking-area {
+      display:grid;
+      grid-template-rows:auto 1fr;
+      min-height:0;
+      height:100%;
+    }
+    .target-item {
+      display:grid;
+      gap:8px;
+      padding:10px 0;
+      border-bottom:1px solid var(--line);
+    }
+    .target-line {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:12px;
+      font-weight:900;
+    }
+    .footer-note {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:22px;
+      padding-top:12px;
+      border-top:1px solid var(--line);
+      color:var(--muted);
+      font-size:11px;
+      font-weight:800;
+    }
+    @media (max-width:1100px) {
+      .page { min-width:0; padding:12px; }
+      .app-shell,.app-header,.g2,.g3,.g4,.g5,.g6,.g7 { grid-template-columns:1fr; }
+      .sidebar { min-height:auto; }
+      .source-line { text-align:left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top-brand">
+      <div>
+        <div class="brand-title"><span class="red">TJ</span>-SalesDB</div>
+        <div class="brand-sub">経営判断を加速する、見やすく・使いやすい営業OS</div>
+      </div>
+    </div>
+
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="side-logo"><span class="red">TJ</span>-SalesDB</div>
+        <nav class="nav">
+          <button id="menu-home" class="nav-btn active" type="button" onclick="switchView('home')">HOME</button>
+          <button id="menu-basic" class="nav-btn" type="button" onclick="switchView('basic')">基本情報</button>
+          <button id="menu-purchase" class="nav-btn" type="button" onclick="switchView('purchase')">買取詳細</button>
+          <button id="menu-sales" class="nav-btn" type="button" onclick="switchView('sales')">販売詳細</button>
+          <button id="menu-marketing" class="nav-btn" type="button" onclick="switchView('marketing')">情報詳細</button>
+          <button id="menu-target" class="nav-btn" type="button" onclick="switchView('target')">目標管理</button>
+          <button id="menu-personal" class="nav-btn" type="button" onclick="switchView('personal')">個人実績</button>
+          <button id="menu-calendar" class="nav-btn" type="button" onclick="switchView('calendar')">カレンダー</button>
+          <button id="menu-settings" class="nav-btn" type="button" onclick="switchView('settings')">設定</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="app-header">
+          <div>
+            <div class="selected-label">選択中の部署</div>
+            <div class="dept-row">
+              <div id="headerDeptName" class="dept-name">-</div>
+              <select id="deptSelect" class="dept-select" onchange="loadDashboard()"></select>
+            </div>
+          </div>
+          <div class="header-actions">
+            <span id="targetMonth" class="pill">対象月 -</span>
+            <span id="updatedAt" class="pill">最終更新 -</span>
+            <button class="update-btn" type="button" onclick="loadDashboard()">更新</button>
+            <div id="topSource" class="source-line">参照 -</div>
+          </div>
+        </header>
+
+        <div class="content">
+          <p id="status" class="status">参照設定から営業部一覧を取得しています。</p>
+          <div id="app"></div>
+          <div class="footer-note">
+            <span>データ集計基準：超新世界リンクOS</span>
+            <span>© TJ-SalesDB</span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    let CURRENT = null;
+    const DEMO_DATA = {
+      selectedDept:'千葉営業部',
+      targetMonth:'2026/06',
+      updatedAt:'2026/06/02 14:30',
+      sourceSpreadsheetName:'TJ-SalesDB Design Demo',
+      sourceSpreadsheetId:'demo-spreadsheet',
+      sourceSheetName:'超新世界リンクOS_千葉',
+      summary:{
+        '営業部名':'千葉営業部',
+        '対象月':'2026/06',
+        '更新日時':'2026/06/02 14:30',
+        'TOPLINE':5000000,
+        '売上':5000000,
+        'G':20700,
+        'MQ':66400,
+        'F':45700,
+        'スタッフ数':49,
+        '拠点数':4,
+        '責任者数':1,
+        'MG人数':4,
+        '買取営業人数':49,
+        '販売営業人数':18,
+        '事務人数':15,
+        '査定Q':396,
+        '買取Q':191,
+        '販売Q':32,
+        '納車Q':32,
+        '成約CVR':0.4823,
+        '査定CVR':0.5629,
+        'AAQ':89,
+        '商品Q':83,
+        'スクラップQ':12,
+        '代車Q':6,
+        'AA比率':0.466,
+        '商品比率':0.435,
+        'スクラップ比率':0.063,
+        '代車比率':0.031,
+        '落札Q':29,
+        '流札Q':9,
+        '取消Q':5,
+        '持越Q':7,
+        '赤字Q':0,
+        '落札MQ':2800,
+        'AA@':285,
+        '未処理MQ':3100,
+        'AA赤字金額':0,
+        '即決契約数':89,
+        '管理契約数':83,
+        '買取キャンセルQ':3,
+        'キャンセル比率':0.049,
+        '入庫平均日数':4.8,
+        '在庫Q':7,
+        '掲載Q':5,
+        '未掲載Q':2,
+        '未入庫Q':1,
+        '未受入Q':0,
+        '配車在庫Q':30,
+        '配車Q':24,
+        'キャパQ':40,
+        'キャパ比率':0.75,
+        '在庫金額':35000,
+        '在庫金額平均':5000,
+        '納車済MQ':14800,
+        '未納車MQ':6100,
+        '販売総MQ':20900,
+        '情報数':1478,
+        '開示数':580,
+        '査定数':325,
+        '成約数':142,
+        '開示率':0.392,
+        '査定率':0.56,
+        '成約率':0.437,
+        '情報料金':4300,
+        '成約CPA':30,
+        '査定CPA':13,
+        '直近層件数':420,
+        '検討層件数':760,
+        '潜在層件数':298,
+        'G目標':24000,
+        'MQ目標':68000,
+        '買取Q目標':250,
+        '販売Q目標':100,
+        '情報数目標':1800,
+        '開示数目標':700,
+        '査定数目標':400,
+        '成約数目標':160
+      },
+      personalRows:[
+        {'氏名':'田中 太郎','拠点':'千葉店','MQ':1800,'買取Q':22,'販売Q':7,'成約CVR':0.436},
+        {'氏名':'佐藤 花子','拠点':'本部','MQ':1620,'買取Q':19,'販売Q':5,'成約CVR':0.417},
+        {'氏名':'鈴木 一郎','拠点':'埼玉店','MQ':1420,'買取Q':16,'販売Q':4,'成約CVR':0.386},
+        {'氏名':'高橋 健','拠点':'千葉店','MQ':980,'買取Q':12,'販売Q':3,'成約CVR':0.31},
+        {'氏名':'山田 美咲','拠点':'東京店','MQ':860,'買取Q':11,'販売Q':2,'成約CVR':0.29}
+      ],
+      calendarRows:[
+        {'日付':'6/1','受注':0,'販売Q':0,'配車Q':8,'査定':12,'契約':5,'成約率':0.4167},
+        {'日付':'6/2','受注':1,'販売Q':1,'配車Q':10,'査定':20,'契約':13,'成約率':0.65},
+        {'日付':'6/3','受注':0,'販売Q':0,'配車Q':9,'査定':19,'契約':6,'成約率':0.3158}
+      ],
+      marketingRows:[
+        {'エリア':'全体','情報数':3140,'開示数':1317,'査定数':648,'査定率':0.492,'契約数':296,'成約率':0.457,'情報成約':0.094,'開示情報成約率':0.225,'開示率':0.419,'情報料金':8600,'査定CPA':13,'成約CPA':29,'一人当たりの情報数':64,'直近層数':780,'検討層数':1420,'潜在層数':940},
+        {'エリア':'千葉','情報数':1478,'開示数':580,'査定数':325,'査定率':0.5603,'契約数':142,'成約率':0.4369,'情報成約':0.0961,'開示情報成約率':0.245,'開示率':0.392,'情報料金':4300,'査定CPA':13,'成約CPA':30,'一人当たりの情報数':30,'直近層数':420,'検討層数':760,'潜在層数':298},
+        {'エリア':'埼玉','情報数':1662,'開示数':737,'査定数':323,'査定率':0.4383,'契約数':154,'成約率':0.4768,'情報成約':0.0927,'開示情報成約率':0.209,'開示率':0.443,'情報料金':4300,'査定CPA':13,'成約CPA':28,'一人当たりの情報数':34,'直近層数':360,'検討層数':660,'潜在層数':642}
+      ],
+      fieldMeta:{
+        'TOPLINE':{trigger:'V2',page:'HOME'},
+        '査定Q':{trigger:'B8',page:'買取詳細'},
+        '買取Q':{trigger:'C8',page:'買取詳細'}
+      }
+    };
+
+    const KEY = {
+      dept:['営業部名'],
+      targetMonth:['対象月'],
+      updatedAt:['更新日時'],
+      topline:['TOPLINE','売上'],
+      g:['G'],
+      mq:['MQ','トータルMQ'],
+      f:['F','トータルF'],
+      staff:['スタッフ数','スタッフ人数'],
+      base:['拠点数'],
+      manager:['責任者数'],
+      purchaseStaff:['買取営業人数'],
+      salesStaff:['販売営業人数'],
+      assessmentQ:['査定Q','査定台数実績'],
+      purchaseQ:['買取Q','買取台数実績'],
+      salesQ:['販売Q','販売台数実績'],
+      shipQ:['納車Q','当月納車Q'],
+      cvr:['成約CVR','買取成約CVR'],
+      assessCvr:['査定CVR','査定率'],
+      aaQ:['AAQ'],
+      itemQ:['商品Q'],
+      scrapQ:['スクラップQ'],
+      loanerQ:['代車Q'],
+      aaRate:['AA比率'],
+      itemRate:['商品比率'],
+      scrapRate:['スクラップ比率'],
+      loanerRate:['代車比率'],
+      bidQ:['落札Q','AA落札Q'],
+      exhibitQ:['出品Q','当月AA出品Q','当月買取出品Q'],
+      unsoldQ:['流札Q','AA流札Q'],
+      cancelAaQ:['取消Q','AA取消Q'],
+      carryQ:['持越Q','AA翌月Q'],
+      aaMq:['落札MQ','当月AAMQ','AAMQ'],
+      aaAvg:['AA@','AA＠'],
+      redLossMoney:['AA赤字金額'],
+      decisionContract:['即決契約数'],
+      managedContract:['管理契約数'],
+      purchaseCancel:['買取キャンセルQ'],
+      stockQ:['在庫Q','在庫台数'],
+      listedQ:['掲載Q','掲載数'],
+      unlistedQ:['未掲載Q','未掲載数'],
+      notArrivedQ:['未入庫Q','未入庫台数'],
+      unacceptedQ:['未受入Q','未受入数'],
+      dispatchStockQ:['配車在庫Q','配車在庫数'],
+      capacityQ:['キャパQ','キャパ台数'],
+      capacityRate:['キャパ比率','キャパ使用率'],
+      stockMoney:['在庫金額'],
+      stockAvg:['在庫金額平均'],
+      deliveredMq:['納車済MQ'],
+      undeliveredMq:['未納車MQ'],
+      salesMq:['販売総MQ'],
+      infoQ:['情報数'],
+      disclosureQ:['開示数'],
+      motaAssessmentQ:['査定数'],
+      contractQ:['成約数'],
+      disclosureRate:['開示率'],
+      motaAssessmentRate:['査定率'],
+      contractRate:['成約率'],
+      infoFee:['情報料金'],
+      near:['直近層件数'],
+      consider:['検討層件数'],
+      latent:['潜在層件数'],
+      gGoal:['G目標'],
+      mqGoal:['MQ目標'],
+      purchaseGoal:['買取Q目標'],
+      salesGoal:['販売Q目標'],
+      infoGoal:['情報数目標'],
+      disclosureGoal:['開示数目標'],
+      assessmentGoal:['査定数目標'],
+      contractGoal:['成約数目標']
+    };
+
+    Object.assign(KEY, {
+      assessmentQ:['査定Q','査定Ｑ','査定数',...(KEY.assessmentQ || [])],
+      purchaseQ:['買取Q','買取Ｑ',...(KEY.purchaseQ || [])],
+      salesQ:['販売Q','販売Ｑ',...(KEY.salesQ || [])],
+      shipQ:['納車台数','納車Q','納車Ｑ',...(KEY.shipQ || [])],
+      cvr:['成約CVR','買取成約CVR','成約率',...(KEY.cvr || [])],
+      assessCvr:['査定CVR','査定率',...(KEY.assessCvr || [])],
+      aaQ:['AA','AAQ',...(KEY.aaQ || [])],
+      itemQ:['商品','商品Q',...(KEY.itemQ || [])],
+      scrapQ:['スクラップ','スクラップQ',...(KEY.scrapQ || [])],
+      loanerQ:['代車','代車Q',...(KEY.loanerQ || [])],
+      bidQ:['落札Q','落札Ｑ',...(KEY.bidQ || [])],
+      exhibitQ:['出品Q','出品Ｑ',...(KEY.exhibitQ || [])],
+      unsoldQ:['流札Q','流札Ｑ',...(KEY.unsoldQ || [])],
+      cancelAaQ:['取消Q','取消Ｑ',...(KEY.cancelAaQ || [])],
+      carryQ:['持越Q','持越Ｑ',...(KEY.carryQ || [])],
+      aaMq:['落札MQ','AAMQ',...(KEY.aaMq || [])],
+      aaAvg:['AA@','AA＠',...(KEY.aaAvg || [])],
+      redLossMoney:['赤字金額','AA赤字金額',...(KEY.redLossMoney || [])],
+      stockQ:['在庫Q','在庫Ｑ','在庫台数',...(KEY.stockQ || [])],
+      listedQ:['掲載Q','掲載Ｑ','掲載数',...(KEY.listedQ || [])],
+      unlistedQ:['未掲載Q','未掲載Ｑ','未掲載数',...(KEY.unlistedQ || [])],
+      notArrivedQ:['未入庫Q','未入庫Ｑ','未入庫台数',...(KEY.notArrivedQ || [])],
+      unacceptedQ:['未受入Q','未受入Ｑ',...(KEY.unacceptedQ || [])],
+      dispatchStockQ:['配車在庫Q','配車在庫Ｑ','配車在庫数',...(KEY.dispatchStockQ || [])],
+      capacityQ:['キャパQ','キャパＱ','キャパ台数',...(KEY.capacityQ || [])],
+      capacityRate:['キャパ比率','キャパ使用率',...(KEY.capacityRate || [])],
+      stockMoney:['在庫金額',...(KEY.stockMoney || [])],
+      deliveredMq:['納車済MQ',...(KEY.deliveredMq || [])],
+      undeliveredMq:['未納車MQ',...(KEY.undeliveredMq || [])],
+      salesMq:['販売総MQ',...(KEY.salesMq || [])],
+      infoQ:['情報数',...(KEY.infoQ || [])],
+      disclosureQ:['開示数',...(KEY.disclosureQ || [])],
+      motaAssessmentQ:['査定数',...(KEY.motaAssessmentQ || [])],
+      contractQ:['契約数','成約数',...(KEY.contractQ || [])],
+      disclosureRate:['開示率',...(KEY.disclosureRate || [])],
+      motaAssessmentRate:['査定率',...(KEY.motaAssessmentRate || [])],
+      contractRate:['成約率',...(KEY.contractRate || [])],
+      infoFee:['情報料金',...(KEY.infoFee || [])],
+      near:['直近層数','直近層件数',...(KEY.near || [])],
+      consider:['検討層数','検討層件数',...(KEY.consider || [])],
+      latent:['潜在層数','潜在層件数',...(KEY.latent || [])],
+      gGoal:['G目標',...(KEY.gGoal || [])],
+      mqGoal:['MQ目標',...(KEY.mqGoal || [])],
+      purchaseGoal:['買取Q目標','買取目標',...(KEY.purchaseGoal || [])],
+      salesGoal:['販売Q目標','販売目標',...(KEY.salesGoal || [])],
+      infoGoal:['情報数目標',...(KEY.infoGoal || [])],
+      disclosureGoal:['開示数目標',...(KEY.disclosureGoal || [])],
+      assessmentGoal:['査定数目標',...(KEY.assessmentGoal || [])],
+      contractGoal:['成約数目標','契約数目標',...(KEY.contractGoal || [])]
+    });
+
+    function esc(v) {
+      return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function num(v) {
+      if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
+      const s = String(v ?? '').replace(/[,\s￥¥%]/g,'');
+      const n = Number(s);
+      return Number.isFinite(n) ? n : 0;
+    }
+    function pick(obj, keys, fallback=0) {
+      for (const key of keys) {
+        if (obj && obj[key] !== undefined && obj[key] !== '') return obj[key];
+      }
+      return fallback;
+    }
+    function fmt(v, type='number', suffix='') {
+      const n = num(v);
+      if (type === 'money') return `¥${Math.round(n * 1000).toLocaleString()}`;
+      if (type === 'yen') return `¥${Math.round(n).toLocaleString()}`;
+      if (type === 'percent') return `${(Math.abs(n) <= 1 ? n * 100 : n).toFixed(1)}%`;
+      if (type === 'days') return `${n.toLocaleString(undefined,{maximumFractionDigits:1})}日`;
+      if (type === 'text') return String(v ?? '-');
+      return `${Math.round(n).toLocaleString()}${suffix}`;
+    }
+    function animatedValue(value,type='number',suffix='') {
+      if (type === 'text') return esc(value || '-');
+      return `<span class="count-up" data-value="${esc(value)}" data-type="${esc(type)}" data-suffix="${esc(suffix)}">${fmt(value,type,suffix)}</span>`;
+    }
+    function rate(part,total) {
+      const t = num(total);
+      return t ? num(part) / t : 0;
+    }
+    function pct(v) {
+      const n = num(v);
+      return Math.max(0, Math.min(100, Math.abs(n) <= 1 ? n * 100 : n));
+    }
+    function setStatus(text, error=false) {
+      const el = document.getElementById('status');
+      if (!el) return;
+      el.textContent = text;
+      el.classList.toggle('error', error);
+    }
+    function runGas(name, args=[]) {
+      if (window.google && google.script && google.script.run) {
+        return new Promise((resolve,reject) => {
+          google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[name](...(args || []));
+        });
+      }
+      return new Promise(resolve => {
+        setTimeout(() => {
+          if (name === 'getSalesOsDeptOptions') resolve(['千葉営業部','神奈川営業部','本部','サービス']);
+          else if (name === 'getSalesOsDashboardByDept') resolve({...DEMO_DATA, selectedDept:args[0] || DEMO_DATA.selectedDept});
+          else resolve({sheetName:'参照設定'});
+        }, 120);
+      });
+    }
+    function section(title, body, more='詳細を見る') {
+      return `<section class="section"><div class="section-head"><div class="section-title">${esc(title)}</div><div class="section-more">${esc(more)} ></div></div><div class="section-body">${body}</div></section>`;
+    }
+    function spark(kind='line') {
+      if (kind === 'bars') {
+        const vals = [42,64,36,78,50,88,58,72,43,76,61,70];
+        return `<svg class="spark" viewBox="0 0 200 44" preserveAspectRatio="none">${vals.map((v,i)=>`<rect x="${i*17+2}" y="${44-v*.42}" width="8" height="${v*.42}" rx="2" fill="#ef4050" opacity=".82"/>`).join('')}</svg>`;
+      }
+      return `<svg class="spark" viewBox="0 0 200 44" preserveAspectRatio="none"><path d="M0 34 L16 22 L32 30 L48 20 L64 18 L80 7 L96 28 L112 13 L128 8 L144 20 L160 18 L176 28 L200 16" fill="none" stroke="#ef4050" stroke-width="3"/><path d="M0 44 L0 34 L16 22 L32 30 L48 20 L64 18 L80 7 L96 28 L112 13 L128 8 L144 20 L160 18 L176 28 L200 16 L200 44 Z" fill="#ef4050" opacity=".10"/></svg>`;
+    }
+    function trendSpark() {
+      return `<svg class="trend-spark" viewBox="0 0 260 82" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="purchaseTrendFill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#ef4050" stop-opacity=".26"/>
+            <stop offset="100%" stop-color="#ef4050" stop-opacity=".02"/>
+          </linearGradient>
+        </defs>
+        <path d="M0 70 L0 54 L24 61 L48 40 L72 50 L96 31 L120 35 L144 20 L168 27 L192 15 L216 24 L240 13 L260 19 L260 82 L0 82 Z" fill="url(#purchaseTrendFill)"/>
+        <path d="M0 54 L24 61 L48 40 L72 50 L96 31 L120 35 L144 20 L168 27 L192 15 L216 24 L240 13 L260 19" fill="none" stroke="#d9001b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <g fill="#d9001b">
+          <circle cx="48" cy="40" r="4"/><circle cx="96" cy="31" r="4"/><circle cx="144" cy="20" r="4"/><circle cx="192" cy="15" r="4"/><circle cx="240" cy="13" r="4"/>
+        </g>
+      </svg>`;
+    }
+    function dailyDualLineChart(calendarRows) {
+      const rows = (calendarRows || []).filter(row => row && Object.keys(row).length);
+      const points = rows.map((row, i) => {
+        const dateLabel = getRowValue(row,['日付','日','譌･莉・']) || `${i + 1}`;
+        const assessment = getRowValue(row,['査定Q','査定','査定数','譟ｻ螳・','譟ｻ螳壽焚']) || 0;
+        const purchase = getRowValue(row,['買取Q','買取','契約','契約数','買取Ｑ','雋ｷ蜿鵬','螂醍ｴ・']) || 0;
+        return { dateLabel, assessment:num(assessment), purchase:num(purchase) };
+      });
+      const source = points.length ? points : [
+        {dateLabel:'1', assessment:12, purchase:5},
+        {dateLabel:'2', assessment:20, purchase:13},
+        {dateLabel:'3', assessment:19, purchase:6},
+        {dateLabel:'4', assessment:15, purchase:6},
+        {dateLabel:'5', assessment:21, purchase:10},
+        {dateLabel:'6', assessment:17, purchase:6}
+      ];
+      const w = 560;
+      const h = 190;
+      const padX = 30;
+      const top = 18;
+      const bottom = 34;
+      const chartH = h - top - bottom;
+      const maxPurchase = Math.max(1,...source.map(p => p.purchase));
+      const maxAssessment = Math.max(1,...source.map(p => p.assessment));
+      const xAt = i => source.length <= 1 ? padX : padX + (i * (w - padX * 2) / (source.length - 1));
+      const yAt = (value,max) => top + chartH - (num(value) / max) * chartH;
+      const toPath = (key,max) => source.map((p,i) => `${i ? 'L' : 'M'}${xAt(i).toFixed(1)} ${yAt(p[key],max).toFixed(1)}`).join(' ');
+      const purchasePath = toPath('purchase', maxPurchase);
+      const assessmentPath = toPath('assessment', maxAssessment);
+      const xLabels = source
+        .filter((_,i) => i === 0 || i === source.length - 1 || i % Math.ceil(source.length / 6) === 0)
+        .map((p,i,arr) => {
+          const originalIndex = source.indexOf(p);
+          return `<text x="${xAt(originalIndex).toFixed(1)}" y="${h - 8}" text-anchor="${i === 0 ? 'start' : i === arr.length - 1 ? 'end' : 'middle'}">${esc(String(p.dateLabel).replace(/^0/,''))}</text>`;
+        }).join('');
+      const purchaseDots = source.map((p,i) => `<circle class="chart-point" data-tooltip="${esc(`${p.dateLabel}\n買取Q ${fmt(p.purchase,'number','台')}`)}" cx="${xAt(i).toFixed(1)}" cy="${yAt(p.purchase,maxPurchase).toFixed(1)}" r="4.2"></circle>`).join('');
+      const assessmentDots = source.map((p,i) => `<circle class="chart-point" data-tooltip="${esc(`${p.dateLabel}\n査定Q ${fmt(p.assessment,'number','台')}`)}" cx="${xAt(i).toFixed(1)}" cy="${yAt(p.assessment,maxAssessment).toFixed(1)}" r="4.0"></circle>`).join('');
+      const latest = source[source.length - 1] || {purchase:0,assessment:0};
+      return `<div class="dual-chart-card">
+        <div class="dual-chart-head">
+          <div class="dual-chart-title">日別推移</div>
+          <div class="dual-chart-legend">
+            <span><i class="red-line"></i>買取Q ${fmt(latest.purchase,'number','台')}</span>
+            <span><i class="blue-line"></i>査定Q ${fmt(latest.assessment,'number','台')}</span>
+          </div>
+        </div>
+        <svg class="dual-line-chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="dualPurchaseFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#ef4050" stop-opacity=".22"/>
+              <stop offset="100%" stop-color="#ef4050" stop-opacity=".02"/>
+            </linearGradient>
+            <linearGradient id="dualAssessmentFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#546e96" stop-opacity=".18"/>
+              <stop offset="100%" stop-color="#546e96" stop-opacity=".02"/>
+            </linearGradient>
+          </defs>
+          <g class="grid-lines">
+            <line x1="${padX}" y1="${top}" x2="${w-padX}" y2="${top}"/>
+            <line x1="${padX}" y1="${top + chartH/2}" x2="${w-padX}" y2="${top + chartH/2}"/>
+            <line x1="${padX}" y1="${top + chartH}" x2="${w-padX}" y2="${top + chartH}"/>
+          </g>
+          <path class="dual-area purchase" d="${purchasePath} L${xAt(source.length-1).toFixed(1)} ${top+chartH} L${padX} ${top+chartH} Z"/>
+          <path class="dual-area assessment" d="${assessmentPath} L${xAt(source.length-1).toFixed(1)} ${top+chartH} L${padX} ${top+chartH} Z"/>
+          <path class="dual-line purchase" d="${purchasePath}"/>
+          <path class="dual-line assessment" d="${assessmentPath}"/>
+          <g class="dual-dots purchase">${purchaseDots}</g>
+          <g class="dual-dots assessment">${assessmentDots}</g>
+          <g class="dual-xlabels">${xLabels}</g>
+        </svg>
+        <div class="dual-axis-note">左軸：買取Q / 右軸：査定Q</div>
+      </div>`;
+    }
+    function salesDailyDualLineChart(calendarRows) {
+      const rows = (calendarRows || []).filter(row => row && Object.keys(row).length);
+      const points = rows.map((row, i) => {
+        const dateLabel = getRowValue(row,['日付','日','譌･莉・']) || `${i + 1}`;
+        const sales = getRowValue(row,['販売Q','販売Ｑ','販売','販売台数','雋ｩ螢ｲQ','髮具ｽｩ陞｢・ｲQ']) || 0;
+        const dispatch = getRowValue(row,['配車Q','配車Ｑ','配車','配車数','配車台数','配車在庫Q','驟崎ｻQ']) || 0;
+        return { dateLabel, sales:num(sales), dispatch:num(dispatch) };
+      });
+      const source = points.length ? points : [
+        {dateLabel:'1', sales:2, dispatch:8},
+        {dateLabel:'2', sales:3, dispatch:10},
+        {dateLabel:'3', sales:1, dispatch:9},
+        {dateLabel:'4', sales:4, dispatch:11},
+        {dateLabel:'5', sales:3, dispatch:12},
+        {dateLabel:'6', sales:5, dispatch:14}
+      ];
+      const w = 560;
+      const h = 190;
+      const padX = 30;
+      const top = 18;
+      const bottom = 34;
+      const chartH = h - top - bottom;
+      const maxSales = Math.max(1,...source.map(p => p.sales));
+      const maxDispatch = Math.max(1,...source.map(p => p.dispatch));
+      const xAt = i => source.length <= 1 ? padX : padX + (i * (w - padX * 2) / (source.length - 1));
+      const yAt = (value,max) => top + chartH - (num(value) / max) * chartH;
+      const toPath = (key,max) => source.map((p,i) => `${i ? 'L' : 'M'}${xAt(i).toFixed(1)} ${yAt(p[key],max).toFixed(1)}`).join(' ');
+      const salesPath = toPath('sales', maxSales);
+      const dispatchPath = toPath('dispatch', maxDispatch);
+      const xLabels = source
+        .filter((_,i) => i === 0 || i === source.length - 1 || i % Math.ceil(source.length / 6) === 0)
+        .map((p,i,arr) => {
+          const originalIndex = source.indexOf(p);
+          return `<text x="${xAt(originalIndex).toFixed(1)}" y="${h - 8}" text-anchor="${i === 0 ? 'start' : i === arr.length - 1 ? 'end' : 'middle'}">${esc(String(p.dateLabel).replace(/^0/,''))}</text>`;
+        }).join('');
+      const salesDots = source.map((p,i) => `<circle class="chart-point" data-tooltip="${esc(`${p.dateLabel}\n販売Q ${fmt(p.sales,'number','台')}`)}" cx="${xAt(i).toFixed(1)}" cy="${yAt(p.sales,maxSales).toFixed(1)}" r="4.2"></circle>`).join('');
+      const dispatchDots = source.map((p,i) => `<circle class="chart-point" data-tooltip="${esc(`${p.dateLabel}\n配車Q ${fmt(p.dispatch,'number','台')}`)}" cx="${xAt(i).toFixed(1)}" cy="${yAt(p.dispatch,maxDispatch).toFixed(1)}" r="4.0"></circle>`).join('');
+      const latest = source[source.length - 1] || {sales:0,dispatch:0};
+      return `<div class="dual-chart-card">
+        <div class="dual-chart-head">
+          <div class="dual-chart-title">日別推移</div>
+          <div class="dual-chart-legend">
+            <span><i class="red-line"></i>販売Q ${fmt(latest.sales,'number','台')}</span>
+            <span><i class="blue-line"></i>配車Q ${fmt(latest.dispatch,'number','台')}</span>
+          </div>
+        </div>
+        <svg class="dual-line-chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="dualSalesFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#ef4050" stop-opacity=".22"/>
+              <stop offset="100%" stop-color="#ef4050" stop-opacity=".02"/>
+            </linearGradient>
+            <linearGradient id="dualDispatchFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#546e96" stop-opacity=".18"/>
+              <stop offset="100%" stop-color="#546e96" stop-opacity=".02"/>
+            </linearGradient>
+          </defs>
+          <g class="grid-lines">
+            <line x1="${padX}" y1="${top}" x2="${w-padX}" y2="${top}"/>
+            <line x1="${padX}" y1="${top + chartH/2}" x2="${w-padX}" y2="${top + chartH/2}"/>
+            <line x1="${padX}" y1="${top + chartH}" x2="${w-padX}" y2="${top + chartH}"/>
+          </g>
+          <path class="dual-area sales" d="${salesPath} L${xAt(source.length-1).toFixed(1)} ${top+chartH} L${padX} ${top+chartH} Z"/>
+          <path class="dual-area dispatch" d="${dispatchPath} L${xAt(source.length-1).toFixed(1)} ${top+chartH} L${padX} ${top+chartH} Z"/>
+          <path class="dual-line sales" d="${salesPath}"/>
+          <path class="dual-line dispatch" d="${dispatchPath}"/>
+          <g class="dual-dots sales">${salesDots}</g>
+          <g class="dual-dots dispatch">${dispatchDots}</g>
+          <g class="dual-xlabels">${xLabels}</g>
+        </svg>
+        <div class="dual-axis-note">左軸：販売Q / 右軸：配車Q</div>
+      </div>`;
+    }
+    function kpi(label,value,type='number',suffix='',sparkKind='line') {
+      const wideSparkClass = ['TOPLINE','G','MQ','F'].includes(String(label).toUpperCase()) ? ' wide-spark' : '';
+      return `<article class="kpi-card${wideSparkClass}">
+        <div class="kpi-icon">${kpiIcon(label)}</div>
+        <div class="kpi-title">${esc(label)}</div>
+        <div class="kpi-value">${animatedValue(value,type,suffix)}</div>
+        <div class="kpi-sub">前月比 <span class="up">▲ ${(6 + Math.random()*8).toFixed(1)}%</span></div>
+        ${spark(sparkKind)}
+      </article>`;
+    }
+    function kpiIcon(label) {
+      const text = String(label || '').toUpperCase();
+      if (text.includes('TOPLINE')) return '¥';
+      if (text === 'G') return '▤';
+      if (text.includes('MQ')) return '◇';
+      if (text === 'F') return '▣';
+      if (text.includes('買取')) return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15h16l-1.6-5.1A3 3 0 0 0 15.5 8h-7A3 3 0 0 0 5.6 9.9L4 15Z"/><path d="M6 15v2.2"/><path d="M18 15v2.2"/><circle cx="7.5" cy="17.5" r="1.7"/><circle cx="16.5" cy="17.5" r="1.7"/><path d="M8 8l1.2-2h5.6L16 8"/></svg>';
+      if (text.includes('販売')) return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.1 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 1.9-1.4L21 7H6.2"/><circle cx="10" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/></svg>';
+      if (text.includes('査定')) return '⌕';
+      if (text.includes('納車')) return '◆';
+      if (text.includes('情報')) return '□';
+      return '●';
+    }
+    function mini(label,value,type='number',suffix='',highlight=false) {
+      return `<article class="mini-card ${highlight ? 'highlight' : ''}">
+        <div class="mini-title">${esc(label)}</div>
+        <div class="mini-value">${animatedValue(value,type,suffix)}</div>
+        <div class="mini-sub">前日比 <span class="up">▲ ${Math.max(1,Math.round(num(value)%24))}${suffix || ''}</span></div>
+      </article>`;
+    }
+    function ratio(label,value,ratioValue,suffix='台',color='') {
+      const w = pct(ratioValue);
+      return `<article class="panel-card">
+        <div class="mini-title">${esc(label)}</div>
+        <div class="panel-number">${animatedValue(value,'number',suffix)} <span style="font-size:14px;color:var(--muted);">${w.toFixed(1)}%</span></div>
+        <div class="bar"><div class="fill ${color}" data-width="${w}"></div></div>
+      </article>`;
+    }
+    function moneyPanel(label,value,sub='') {
+      return `<article class="panel-card"><div class="mini-title">${esc(label)}</div><div class="panel-number">${animatedValue(value,'money')}</div><div class="mini-sub">${esc(sub)}</div></article>`;
+    }
+    function stack(title, items) {
+      const total = items.reduce((sum,it)=>sum + num(it.value),0) || 1;
+      const colors = ['red','black','blue','gray'];
+      return `<article class="panel-card">
+        <div class="panel-head"><div class="panel-title">${esc(title)}</div></div>
+        <div class="stack">${items.map((it,i)=>`<div class="seg ${colors[i%colors.length]}" data-width="${rate(it.value,total)*100}"></div>`).join('')}</div>
+        ${items.map((it,i)=>`<div class="ratio-row"><span>${esc(it.label)} ${fmt(it.value,'number','台')}</span><span>${(rate(it.value,total)*100).toFixed(1)}%</span></div>`).join('')}
+      </article>`;
+    }
+    function donutMarkup(items,mother,unit='台') {
+      const total = Math.max(1,num(mother));
+      const rawParts = items.map(item => ({...item, ratio:rate(item.value,total)}));
+      const rawTotal = rawParts.reduce((sum,item) => sum + item.ratio,0);
+      const visualParts = rawParts.map(item => ({...item, visualRatio: rawTotal > 1 ? item.ratio / rawTotal : item.ratio}));
+      if (rawTotal < 1) visualParts.push({label:'その他', value:total * (1 - rawTotal), color:'#eef1f5', cls:'gray', ratio:1 - rawTotal, visualRatio:1 - rawTotal});
+      let start = 0;
+      const gradient = visualParts.map(item => {
+        const deg = item.visualRatio * 360;
+        const part = `${item.color} ${start}deg ${start + deg}deg`;
+        start += deg;
+        return part;
+      }).join(', ');
+      return `<div class="donut-layout">
+        <div class="donut" style="background:conic-gradient(${gradient});"></div>
+        <div class="donut-legend">
+          ${rawParts.map(item => `<div class="legend-row"><span class="legend-swatch ${item.cls}"></span><span>${esc(item.label)} ${fmt(item.value,'number',unit)}</span><strong>${(item.ratio*100).toFixed(1)}%</strong></div>`).join('')}
+        </div>
+      </div>`;
+    }
+    function targetProgress(label, actual, goal, type='number', suffix='') {
+      const p = rate(actual,goal) * 100;
+      return `<div class="target-item">
+        <div class="target-line"><span>${esc(label)}</span><span>${p.toFixed(1)}%</span></div>
+        <div class="target-line"><span>実績 ${fmt(actual,type,suffix)}</span><span>目標 ${fmt(goal,type,suffix)}</span></div>
+        <div class="bar"><div class="fill ${p >= 100 ? 'green' : p >= 80 ? '' : 'black'}" data-width="${Math.min(120,p)}"></div></div>
+      </div>`;
+    }
+    function forecastCompareBar(label, forecast, goal) {
+      const max = Math.max(1,num(forecast),num(goal));
+      return `<div style="margin-top:9px;">
+        <div class="ratio-row"><span>${esc(label)} 予想 ${fmt(forecast,'number','件')}</span><span>目標 ${fmt(goal,'number','件')}</span></div>
+        <div class="bar"><div class="fill" data-width="${rate(forecast,max)*100}"></div></div>
+        <div class="bar" style="margin-top:4px;"><div class="fill black" data-width="${rate(goal,max)*100}"></div></div>
+      </div>`;
+    }
+    function goalProgressBar(label, actual, goal, type='number', suffix='') {
+      const p = rate(actual,goal) * 100;
+      const width = Math.max(3,Math.min(100,p));
+      const stateClass = p >= 100 ? ' green' : p < 70 ? ' black' : '';
+      return `<div class="goal-progress-item">
+        <div class="goal-progress-head"><span>${esc(label)}</span><span>${p.toFixed(1)}%</span></div>
+        <div class="goal-progress-bar">
+          <div class="goal-progress-fill${stateClass}" data-width="${width}"></div>
+          <div class="goal-progress-text">実績 ${fmt(actual,type,suffix)} / 目標 ${fmt(goal,type,suffix)}</div>
+        </div>
+      </div>`;
+    }
+    function table(rows) {
+      if (!rows || !rows.length) return '<div class="status error">データがありません。</div>';
+      const heads = Array.from(new Set(rows.flatMap(r => Object.keys(r))));
+      return `<div class="table-wrap"><table><thead><tr>${heads.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${heads.map(h=>`<td>${esc(r[h] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    }
+    function getRowValue(row, keys) {
+      for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== '') return row[key];
+      }
+      return 0;
+    }
+    function ranking(title, rows, keys, type='money', suffix='') {
+      const sorted = [...(rows || [])].sort((a,b)=>num(getRowValue(b,keys))-num(getRowValue(a,keys))).slice(0,5);
+      return `<article class="panel-card">
+        <div class="panel-head"><div class="panel-title">${esc(title)}</div></div>
+        <table class="ranking-table">
+          <thead><tr><th>順位</th><th>スタッフ名</th><th>スコア</th></tr></thead>
+          <tbody>${sorted.map((r,i)=>{
+            const cls = i === 0 ? 'top' : i === 1 ? 'second' : i === 2 ? 'third' : '';
+            const name = getRowValue(r,['氏名','豌丞錐']) || '-';
+            return `<tr><td><span class="rank-badge ${cls}">${i+1}</span></td><td>${esc(name)}</td><td>${fmt(getRowValue(r,keys),type,suffix)}</td></tr>`;
+          }).join('')}</tbody>
+        </table>
+      </article>`;
+    }
+    function homePersonalPanel(rows) {
+      return `<article class="panel-card home-ranking-card">
+        <div class="panel-head"><div class="panel-title">個人実績</div><div class="panel-link">詳細を見る ></div></div>
+        ${homeRankBlock('MQランキング', rows, ['MQ'], 'money')}
+        ${homeRankBlock('買取ランキング', rows, ['買取Q','雋ｷ蜿鵬'], 'number', '台')}
+        ${homeRankBlock('販売ランキング', rows, ['販売Q','雋ｩ螢ｲQ'], 'number', '台')}
+      </article>`;
+    }
+    function homeRankBlock(title, rows, keys, type='number', suffix='', limit=3) {
+      const sorted = [...(rows || [])].sort((a,b)=>num(getRowValue(b,keys))-num(getRowValue(a,keys))).slice(0,limit);
+      return `<div class="home-rank-block">
+        <div class="home-rank-title">${esc(title)}</div>
+        ${sorted.map((row,i)=>{
+          const cls = i === 0 ? 'top' : i === 1 ? 'second' : 'third';
+          const name = getRowValue(row,['氏名','豌丞錐']) || '-';
+          return `<div class="home-rank-row"><span class="rank-badge ${cls}">${i+1}</span><span class="home-rank-name">${esc(name)}</span><span class="home-rank-score">${fmt(getRowValue(row,keys),type,suffix)}</span></div>`;
+        }).join('')}
+      </div>`;
+    }
+    function targetPersonalPanel(s, rows) {
+      return `<article class="panel-card home-purchase-card calendar-card">
+        <div class="panel-head"><div class="panel-title">目標進捗・個人実績</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="sub-block" style="border-top:0;padding-top:0;">
+          <div class="sub-block-title">目標進捗</div>
+          <div class="goal-progress-list">
+            ${goalProgressBar('G',pick(s,KEY.g,0),pick(s,KEY.gGoal,0),'money')}
+            ${goalProgressBar('MQ',pick(s,KEY.mq,0),pick(s,KEY.mqGoal,0),'money')}
+            ${goalProgressBar('買取Q',pick(s,KEY.purchaseQ,0),pick(s,KEY.purchaseGoal,0),'number','台')}
+            ${goalProgressBar('販売Q',pick(s,KEY.salesQ,0),pick(s,KEY.salesGoal,0),'number','台')}
+            ${goalProgressBar('査定Q',pick(s,KEY.assessmentQ,0),pick(s,KEY.assessmentGoal,0),'number','台')}
+          </div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">個人実績 TOP3</div>
+          ${homeRankBlock('MQランキング', rows, ['MQ'], 'money')}
+          ${homeRankBlock('買取ランキング', rows, ['買取Q','雋ｷ蜿鵬'], 'number', '台')}
+          ${homeRankBlock('販売ランキング', rows, ['販売Q','雋ｩ螢ｲQ'], 'number', '台')}
+        </div>
+      </article>`;
+    }
+    function homeCalendarPanel(calendarRows) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+      const first = new Date(year, month, 1);
+      const days = new Date(year, month + 1, 0).getDate();
+      const startBlank = first.getDay();
+      const rowMap = new Map((calendarRows || []).map(row => [String(row['日付'] || row['日'] || '').replace(/^0/,'') , row]));
+      const cells = [];
+      for (let i = 0; i < startBlank; i++) cells.push('<div class="cal-day empty"></div>');
+      for (let d = 1; d <= days; d++) {
+        const keys = [`${month + 1}/${d}`,`${d}`,`${String(month + 1).padStart(2,'0')}/${String(d).padStart(2,'0')}`];
+        const row = keys.map(k => rowMap.get(k)).find(Boolean) || {};
+        const p = getRowValue(row,['買取Q','買取','契約']) || 0;
+        const s = getRowValue(row,['販売Q','販売','受注']) || 0;
+        const cls = d === today.getDate() ? ' cal-today' : '';
+        cells.push(`<div class="cal-day${cls}">
+          <div class="cal-date">${d}</div>
+          <div class="cal-metric">買取 ${fmt(p,'number','台')}</div>
+          <div class="cal-metric">販売 ${fmt(s,'number','台')}</div>
+        </div>`);
+      }
+      return `<article class="panel-card home-purchase-card">
+        <div class="panel-head"><div class="panel-title">カレンダー</div><div class="panel-link">${year}/${String(month + 1).padStart(2,'0')}</div></div>
+        <div class="sub-block" style="border-top:0;padding-top:0;">
+          <div class="mini-calendar">
+            ${['日','月','火','水','木','金','土'].map(d => `<div class="cal-head">${d}</div>`).join('')}
+            ${cells.join('')}
+          </div>
+        </div>
+      </article>`;
+    }
+    function homeCalendarPanelV2(calendarRows) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+      const days = new Date(year, month + 1, 0).getDate();
+      const weekdays = ['日','月','火','水','木','金','土'];
+      const rowMap = new Map((calendarRows || []).map(row => [String(row['日付'] || row['日'] || '').replace(/^0/,''), row]));
+      const rows = [];
+      for (let d = 1; d <= days; d++) {
+        const date = new Date(year, month, d);
+        const keys = [`${month + 1}/${d}`,`${d}`,`${String(month + 1).padStart(2,'0')}/${String(d).padStart(2,'0')}`];
+        const row = keys.map(k => rowMap.get(k)).find(Boolean) || {};
+        const purchase = getRowValue(row,['買取Q','買取','契約']) || 0;
+        const sales = getRowValue(row,['販売Q','販売','受注']) || 0;
+        const cvr = getRowValue(row,['成約CVR','成約率']) || 0;
+        const cls = d === today.getDate() ? ' today' : '';
+        rows.push(`<div class="calendar-row${cls}">
+          <div class="calendar-date">${month + 1}/${d}</div>
+          <div class="calendar-weekday">${weekdays[date.getDay()]}</div>
+          <div class="calendar-kpi">買取Q ${fmt(purchase,'number','台')}</div>
+          <div class="calendar-kpi">販売Q ${fmt(sales,'number','台')}</div>
+          <div class="calendar-kpi">成約CVR ${fmt(cvr,'percent')}</div>
+        </div>`);
+      }
+      return `<article class="panel-card home-purchase-card calendar-card">
+        <div class="panel-head"><div class="panel-title">カレンダー</div><div class="panel-link">${year}/${String(month + 1).padStart(2,'0')}</div></div>
+        <div class="sub-block" style="border-top:0;padding-top:0;">
+          <div class="calendar-list">${rows.join('')}</div>
+        </div>
+      </article>`;
+    }
+    function renderDashboard(data) {
+      CURRENT = data;
+      const s = data.summary || {};
+      const dept = data.selectedDept || pick(s,KEY.dept,'-');
+      document.getElementById('headerDeptName').textContent = dept;
+      document.getElementById('targetMonth').textContent = `対象月 ${data.targetMonth || pick(s,KEY.targetMonth,'-')}`;
+      document.getElementById('updatedAt').textContent = `最終更新 ${data.updatedAt || pick(s,KEY.updatedAt,'-')}`;
+      document.getElementById('topSource').textContent = `参照: ${data.sourceSpreadsheetName || '-'} / ${data.sourceSheetName || '-'}`;
+      renderPages(data);
+      runBars();
+    }
+    function renderPages(data) {
+      const s = data.summary || {};
+      const personal = data.personalRows || [];
+      const calendar = data.calendarRows || [];
+      const marketingRows = data.marketingRows || [];
+      const fieldMeta = data.fieldMeta || {};
+      const assessmentQ = pick(s,KEY.assessmentQ,0);
+      const purchaseQ = pick(s,KEY.purchaseQ,0);
+      const salesQ = pick(s,KEY.salesQ,0);
+      const shipQ = pick(s,KEY.shipQ,0);
+      const infoQ = pick(s,KEY.infoQ,0);
+      document.getElementById('app').innerHTML = `
+        <div id="view-home" class="view active">
+          ${section('最重要KPI（トップライン）',`
+            <div class="grid g4">
+              ${kpi('TOPLINE',pick(s,KEY.topline,0),'money','','line')}
+              ${kpi('G',pick(s,KEY.g,0),'money','','line')}
+              ${kpi('MQ',pick(s,KEY.mq,0),'money','','line')}
+              ${kpi('F',pick(s,KEY.f,0),'money','','line')}
+            </div>
+          `,'一目で把握')}
+          <div class="grid g5" style="margin-top:18px;">
+            ${smallPurchasePanelV2(s,purchaseQ)}
+            ${smallSalesPanelV2(s,salesQ)}
+            ${smallMarketingPanelV2(s,infoQ)}
+            ${smallTargetPanelV4(s,personal)}
+            ${homeCalendarPanelV2(calendar)}
+          </div>
+        </div>
+        <div id="view-basic" class="view">
+          ${section('基本情報',`
+            <div class="grid g4">
+              ${mini('営業部名',data.selectedDept || pick(s,KEY.dept,'-'),'text')}
+              ${mini('スタッフ数',pick(s,KEY.staff,0),'number','名')}
+              ${mini('拠点数',pick(s,KEY.base,0),'number','拠点')}
+              ${mini('責任者数',pick(s,KEY.manager,0),'number','名')}
+              ${mini('買取営業人数',pick(s,KEY.purchaseStaff,0),'number','名')}
+              ${mini('販売営業人数',pick(s,KEY.salesStaff,0),'number','名')}
+            </div>
+          `)}
+        </div>
+        <div id="view-purchase" class="view">
+          ${section('買取実績',`
+            <div class="grid g3">${kpi('査定Q',assessmentQ,'number','台')}${kpi('買取Q',purchaseQ,'number','台')}${kpi('成約CVR',pick(s,KEY.cvr,0),'percent')}</div>
+            <div class="grid g4" style="margin-top:14px;">
+              ${ratio('AA',pick(s,KEY.aaQ,0),pick(s,KEY.aaRate,rate(pick(s,KEY.aaQ,0),purchaseQ)))}
+              ${ratio('商品',pick(s,KEY.itemQ,0),pick(s,KEY.itemRate,rate(pick(s,KEY.itemQ,0),purchaseQ)))}
+              ${ratio('スクラップ',pick(s,KEY.scrapQ,0),pick(s,KEY.scrapRate,rate(pick(s,KEY.scrapQ,0),purchaseQ)))}
+              ${ratio('代車',pick(s,KEY.loanerQ,0),pick(s,KEY.loanerRate,rate(pick(s,KEY.loanerQ,0),purchaseQ)))}
+            </div>
+          `)}
+          ${section('AA詳細',`
+            <div class="grid g4">
+              ${mini('落札Q',pick(s,KEY.bidQ,0),'number','台')}
+              ${mini('流札Q',pick(s,KEY.unsoldQ,0),'number','台')}
+              ${mini('取消Q',pick(s,KEY.cancelAaQ,0),'number','台')}
+              ${mini('持越Q',pick(s,KEY.carryQ,0),'number','台')}
+              ${moneyPanel('落札MQ',pick(s,KEY.aaMq,0))}
+              ${moneyPanel('AA@',pick(s,KEY.aaAvg,0))}
+              ${moneyPanel('AA赤字金額',pick(s,KEY.redLossMoney,0))}
+            </div>
+          `)}
+          ${section('査定成約・管理',`
+            <div class="grid g4">
+              ${ratio('即決契約',pick(s,KEY.decisionContract,0),rate(pick(s,KEY.decisionContract,0),purchaseQ),'件')}
+              ${ratio('管理契約',pick(s,KEY.managedContract,0),rate(pick(s,KEY.managedContract,0),purchaseQ),'件','blue')}
+              ${ratio('買取キャンセル',pick(s,KEY.purchaseCancel,0),pick(s,['キャンセル比率'],rate(pick(s,KEY.purchaseCancel,0),purchaseQ)),'台','black')}
+              ${mini('入庫平均日数',pick(s,['入庫平均日数','蜈･蠎ｫ蟷ｳ蝮・律謨ｰ'],0),'days')}
+            </div>
+          `)}
+        </div>
+        <div id="view-sales" class="view">
+          ${section('受注・納車',`
+            <div class="grid g4">
+              ${kpi('納車Q',shipQ,'number','台')}
+              ${kpi('受注Q',pick(s,['受注Q','蠖捺怦蜿玲ｳｨ・ｱ'],0),'number','台')}
+              ${mini('未納車Q',pick(s,['未納車Q','蠖捺怦譛ｪ邏崎ｻ奇ｼｱ'],0),'number','台')}
+              ${mini('翌月納車Q',pick(s,['翌月納車Q','鄙梧怦邏崎ｻ奇ｼｱ'],0),'number','台')}
+            </div>
+          `)}
+          ${section('在庫状況',`
+            <div class="grid g4">
+              ${kpi('在庫Q',pick(s,KEY.stockQ,0),'number','台')}
+              ${kpi('掲載Q',pick(s,KEY.listedQ,0),'number','台')}
+              ${kpi('配車在庫Q',pick(s,KEY.dispatchStockQ,0),'number','台')}
+              ${moneyPanel('在庫金額',pick(s,KEY.stockMoney,0),`1台平均 ${fmt(pick(s,KEY.stockAvg,0),'money')}`)}
+              ${ratio('未掲載Q',pick(s,KEY.unlistedQ,0),pick(s,['未掲載比率'],rate(pick(s,KEY.unlistedQ,0),pick(s,KEY.stockQ,0))))}
+              ${ratio('未入庫Q',pick(s,KEY.notArrivedQ,0),pick(s,['未入庫比率'],rate(pick(s,KEY.notArrivedQ,0),pick(s,KEY.dispatchStockQ,0))))}
+              ${ratio('未受入Q',pick(s,KEY.unacceptedQ,0),pick(s,['未受入比率'],rate(pick(s,KEY.unacceptedQ,0),pick(s,KEY.stockQ,0))))}
+              ${ratio('キャパQ',pick(s,KEY.capacityQ,0),pick(s,KEY.capacityRate,0))}
+            </div>
+          `)}
+          ${section('販売収益・付帯',`
+            <div class="grid g4">
+              ${moneyPanel('納車済MQ',pick(s,KEY.deliveredMq,0))}
+              ${moneyPanel('未納車MQ',pick(s,KEY.undeliveredMq,0))}
+              ${moneyPanel('販売総MQ',pick(s,KEY.salesMq,0))}
+            </div>
+          `)}
+        </div>
+        <div id="view-marketing" class="view">
+          ${section('情報実績',`
+            <div class="grid g4">
+              ${kpi('情報数',infoQ,'number','件')}
+              ${kpi('開示数',pick(s,KEY.disclosureQ,0),'number','件')}
+              ${kpi('査定数',pick(s,KEY.motaAssessmentQ,0),'number','件')}
+              ${kpi('成約数',pick(s,KEY.contractQ,0),'number','件')}
+              ${ratio('開示率',pick(s,KEY.disclosureQ,0),pick(s,KEY.disclosureRate,0),'件')}
+              ${ratio('査定率',pick(s,KEY.motaAssessmentQ,0),pick(s,KEY.motaAssessmentRate,0),'件')}
+              ${ratio('成約率',pick(s,KEY.contractQ,0),pick(s,KEY.contractRate,0),'件')}
+              ${moneyPanel('情報料金',pick(s,KEY.infoFee,0))}
+            </div>
+          `)}
+          ${section('温度別',stack('温度別構成',[
+            {label:'直近層',value:pick(s,KEY.near,0)},
+            {label:'検討層',value:pick(s,KEY.consider,0)},
+            {label:'潜在層',value:pick(s,KEY.latent,0)}
+          ]))}
+        </div>
+        <div id="view-target" class="view">
+          ${section('目標進捗',`
+            <div class="grid g2">
+              <article class="panel-card">
+                ${targetProgress('G',pick(s,KEY.g,0),pick(s,KEY.gGoal,0),'money')}
+                ${targetProgress('MQ',pick(s,KEY.mq,0),pick(s,KEY.mqGoal,0),'money')}
+                ${targetProgress('買取Q',purchaseQ,pick(s,KEY.purchaseGoal,0),'number','台')}
+                ${targetProgress('販売Q',salesQ,pick(s,KEY.salesGoal,0),'number','台')}
+              </article>
+              <article class="panel-card">
+                ${targetProgress('情報数',infoQ,pick(s,KEY.infoGoal,0),'number','件')}
+                ${targetProgress('開示数',pick(s,KEY.disclosureQ,0),pick(s,KEY.disclosureGoal,0),'number','件')}
+                ${targetProgress('査定数',pick(s,KEY.motaAssessmentQ,0),pick(s,KEY.assessmentGoal,0),'number','件')}
+                ${targetProgress('成約数',pick(s,KEY.contractQ,0),pick(s,KEY.contractGoal,0),'number','件')}
+              </article>
+            </div>
+          `)}
+        </div>
+        <div id="view-personal" class="view">
+          ${section('ランキング',`
+            <div class="grid g3">
+              ${ranking('MQランキング',personal,['MQ'],'money')}
+              ${ranking('買取ランキング',personal,['買取Q','雋ｷ蜿鵬'],'number','台')}
+              ${ranking('販売ランキング',personal,['販売Q','雋ｩ螢ｲQ'],'number','台')}
+            </div>
+          `)}
+          ${section('個人実績一覧',table(personal))}
+        </div>
+        <div id="view-calendar" class="view">${section('日別実績',table(calendar))}</div>
+        <div id="view-settings" class="view">
+          ${section('参照設定',`
+            <div class="grid g2">
+              ${mini('選択営業部',data.selectedDept || pick(s,KEY.dept,'-'),'text')}
+              ${mini('取得項目数',Object.keys(s).length,'number','項目')}
+            </div>
+            <div class="mini-sub" style="margin-top:12px;">スプレッドシートID：${esc(data.sourceSpreadsheetId || '-')}<br>シート名：${esc(data.sourceSheetName || '-')}</div>
+          `)}
+          ${section('全取得データ',rawDataTable(s,fieldMeta))}
+        </div>
+      `;
+      const basicView = document.getElementById('view-basic');
+      if (basicView) basicView.innerHTML = basicInfoPage(data, s);
+      const purchaseView = document.getElementById('view-purchase');
+      if (purchaseView) purchaseView.innerHTML = purchaseDetailPage(s, assessmentQ, purchaseQ, calendar);
+      const salesView = document.getElementById('view-sales');
+      if (salesView) salesView.innerHTML = salesDetailPage(s, salesQ, shipQ, calendar);
+      const marketingView = document.getElementById('view-marketing');
+      if (marketingView) marketingView.innerHTML = marketingDetailPage(s, infoQ, marketingRows, calendar);
+      const targetView = document.getElementById('view-target');
+      if (targetView) targetView.innerHTML = targetManagePage(s);
+      const personalView = document.getElementById('view-personal');
+      if (personalView) personalView.innerHTML = personalManagePage(personal);
+      const calendarView = document.getElementById('view-calendar');
+      if (calendarView) calendarView.innerHTML = calendarManagePage(calendar, s);
+    }
+    function smallPurchasePanel(s,purchaseQ) {
+      return `<article class="panel-card"><div class="panel-head"><div class="panel-title">買取実績</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="panel-number">${fmt(purchaseQ,'number','台')}</div>
+        ${ratio('AA比率',pick(s,KEY.aaQ,0),pick(s,KEY.aaRate,0)).replace('panel-card','')}
+      </article>`;
+    }
+    function smallPurchasePanelV2(s,purchaseQ) {
+      const bidQ = pick(s,KEY.bidQ,0);
+      const exhibitQ = pick(s,KEY.exhibitQ,num(bidQ) + num(pick(s,KEY.unsoldQ,0)) + num(pick(s,KEY.cancelAaQ,0)));
+      const bidRate = rate(bidQ,exhibitQ);
+      const dayDiff = pick(s,['買取Q前日差','買取前日差'],Math.max(1,Math.round(num(purchaseQ) * .047)));
+      const routeItems = [
+        {label:'AAQ', value:pick(s,KEY.aaQ,0), color:'var(--red)', cls:''},
+        {label:'商品Q', value:pick(s,KEY.itemQ,0), color:'#111', cls:'black'},
+        {label:'スクラップQ', value:pick(s,KEY.scrapQ,0), color:'#5d7fa8', cls:'blue'},
+        {label:'代車Q', value:pick(s,KEY.loanerQ,0), color:'#c7ced8', cls:'gray'}
+      ];
+      const routeDonut = donutMarkup(routeItems,purchaseQ);
+      return `<article class="panel-card home-purchase-card">
+        <div class="panel-head"><div class="panel-title">買取実績</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="purchase-main-block">
+          <div class="mini-title">買取台数</div>
+          <div class="metric-row">
+            <div class="metric-main">${animatedValue(purchaseQ,'number','台')}</div>
+            <div class="trend-chip">▲ ${fmt(dayDiff,'number','台')}</div>
+          </div>
+          ${trendSpark()}
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">査定・成約</div>
+          <div class="compact-pair">
+            <div class="compact-metric"><div class="compact-label">査定Q</div><div class="compact-value">${animatedValue(pick(s,KEY.assessmentQ,0),'number','台')}</div></div>
+            <div class="compact-metric">
+              <div class="compact-label">成約CVR</div>
+              <div class="compact-value">${animatedValue(pick(s,KEY.cvr,0),'percent')}</div>
+              <div class="bar" style="margin-top:8px;"><div class="fill" data-width="${pct(pick(s,KEY.cvr,0))}"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">販路内訳</div>
+          ${routeDonut}
+          <div class="mini-sub">母数：買取Q ${fmt(purchaseQ,'number','台')}</div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">AA詳細</div>
+          <div class="compact-pair">
+            <div class="compact-metric"><div class="compact-label">出品Q</div><div class="compact-value">${animatedValue(exhibitQ,'number','台')}</div></div>
+            <div class="compact-metric"><div class="compact-label">落札Q</div><div class="compact-value">${animatedValue(bidQ,'number','台')}</div></div>
+            <div class="compact-metric"><div class="compact-label">流札Q</div><div class="compact-value">${animatedValue(pick(s,KEY.unsoldQ,0),'number','台')}</div></div>
+            <div class="compact-metric"><div class="compact-label">取消Q</div><div class="compact-value">${animatedValue(pick(s,KEY.cancelAaQ,0),'number','台')}</div></div>
+          </div>
+          <div class="ratio-row"><span>落札比率</span><span>${fmt(bidRate,'percent')}</span></div>
+          <div class="bar"><div class="fill" data-width="${pct(bidRate)}"></div></div>
+        </div>
+        <div class="sub-block aa-revenue-block">
+          <div class="sub-block-title">AA収益</div>
+          <div class="compact-pair">
+            <div class="compact-metric"><div class="compact-label">落札MQ</div><div class="compact-value">${animatedValue(pick(s,KEY.aaMq,0),'money')}</div></div>
+            <div class="compact-metric"><div class="compact-label">AA@</div><div class="compact-value">${animatedValue(pick(s,KEY.aaAvg,0),'money')}</div></div>
+          </div>
+          <div class="mini-sub">前週比は基幹データ追加後に連動</div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">翌月管理</div>
+          <div class="compact-metric"><div class="compact-label">翌月Q</div><div class="compact-value">${animatedValue(pick(s,KEY.carryQ,0),'number','台')}</div></div>
+        </div>
+      </article>`;
+    }
+    function smallSalesPanel(s) {
+      return `<article class="panel-card"><div class="panel-head"><div class="panel-title">販売実績</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="panel-number">${fmt(pick(s,KEY.salesQ,0),'number','台')}</div>
+        ${ratio('在庫状況',pick(s,KEY.stockQ,0),rate(pick(s,KEY.stockQ,0),pick(s,KEY.capacityQ,0))).replace('panel-card','')}
+      </article>`;
+    }
+    function smallSalesPanelV2(s,salesQ) {
+      const stockQ = pick(s,KEY.stockQ,0);
+      const unlistedQ = pick(s,KEY.unlistedQ,0);
+      const unacceptedQ = pick(s,KEY.unacceptedQ,0);
+      const notArrivedQ = pick(s,KEY.notArrivedQ,0);
+      const dispatchStockQ = pick(s,KEY.dispatchStockQ,0);
+      const salesMq = pick(s,KEY.salesMq,0);
+      const salesAvg = rate(salesMq,salesQ);
+      const shipQ = pick(s,KEY.shipQ,0);
+      const undeliveredQ = pick(s,['未納車Q','当月未納車Q'],0);
+      const shipTotal = Math.max(1,num(shipQ) + num(undeliveredQ));
+      const turnoverForecast = pick(s,['回転率予想','回転数予想','回転率予想数値'],0);
+      const turnoverGoal = pick(s,['回転率目標','回転数目標'],0);
+      const turnoverMax = Math.max(1,num(turnoverForecast),num(turnoverGoal));
+      const total = Math.max(1,num(dispatchStockQ));
+      const slices = [
+        {label:'在庫Q', value:stockQ, color:'var(--red)', cls:''},
+        {label:'未掲載Q', value:unlistedQ, color:'#111', cls:'black'},
+        {label:'未受入Q', value:unacceptedQ, color:'#5d7fa8', cls:'blue'},
+        {label:'未入庫Q', value:notArrivedQ, color:'#c7ced8', cls:'gray'}
+      ];
+      const rawParts = slices.map(item => ({...item, ratio:rate(item.value,total)}));
+      const rawTotal = rawParts.reduce((sum,item) => sum + item.ratio,0);
+      const visualParts = rawParts.map(item => ({...item, visualRatio: rawTotal > 1 ? item.ratio / rawTotal : item.ratio}));
+      if (rawTotal < 1) visualParts.push({label:'その他', value:total * (1 - rawTotal), color:'#eef1f5', cls:'gray', ratio:1 - rawTotal, visualRatio:1 - rawTotal});
+      let start = 0;
+      const gradient = visualParts.map(item => {
+        const deg = item.visualRatio * 360;
+        const part = `${item.color} ${start}deg ${start + deg}deg`;
+        start += deg;
+        return part;
+      }).join(', ');
+      const dayDiff = pick(s,['販売Q前日差','販売前日差'],Math.max(1,Math.round(num(salesQ) * .05)));
+      return `<article class="panel-card home-purchase-card">
+        <div class="panel-head"><div class="panel-title">販売実績</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="purchase-main-block">
+          <div class="mini-title">販売Q</div>
+          <div class="metric-row">
+            <div class="metric-main">${animatedValue(salesQ,'number','台')}</div>
+            <div class="trend-chip">▲ ${fmt(dayDiff,'number','台')}</div>
+          </div>
+          ${trendSpark()}
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">在庫状況</div>
+          <div class="donut-layout">
+            <div class="donut" style="background:conic-gradient(${gradient});"></div>
+            <div class="donut-legend">
+              ${rawParts.map(item => `<div class="legend-row"><span class="legend-swatch ${item.cls}"></span><span>${esc(item.label)} ${fmt(item.value,'number','台')}</span><strong>${(item.ratio*100).toFixed(1)}%</strong></div>`).join('')}
+            </div>
+          </div>
+          <div class="mini-sub">母数：配車在庫Q ${fmt(dispatchStockQ,'number','台')}</div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">納車・未納車</div>
+          <div class="compact-pair">
+            <div class="compact-metric"><div class="compact-label">納車Q</div><div class="compact-value">${animatedValue(shipQ,'number','台')}</div></div>
+            <div class="compact-metric"><div class="compact-label">未納車Q</div><div class="compact-value">${animatedValue(undeliveredQ,'number','台')}</div></div>
+          </div>
+          <div class="stack" style="margin-top:10px;">
+            <div class="seg red" data-width="${rate(shipQ,shipTotal)*100}"></div>
+            <div class="seg black" data-width="${rate(undeliveredQ,shipTotal)*100}"></div>
+          </div>
+          <div class="ratio-row"><span>納車 ${fmt(rate(shipQ,shipTotal),'percent')}</span><span>未納車 ${fmt(rate(undeliveredQ,shipTotal),'percent')}</span></div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">回転率 予想・目標</div>
+          <div class="compact-pair">
+            <div class="compact-metric"><div class="compact-label">予想数値</div><div class="compact-value">${animatedValue(turnoverForecast,'percent')}</div></div>
+            <div class="compact-metric"><div class="compact-label">目標数値</div><div class="compact-value">${animatedValue(turnoverGoal,'percent')}</div></div>
+          </div>
+          <div class="ratio-row"><span>予想</span><span>${fmt(turnoverForecast,'percent')}</span></div>
+          <div class="bar"><div class="fill" data-width="${rate(turnoverForecast,turnoverMax)*100}"></div></div>
+          <div class="ratio-row"><span>目標</span><span>${fmt(turnoverGoal,'percent')}</span></div>
+          <div class="bar"><div class="fill black" data-width="${rate(turnoverGoal,turnoverMax)*100}"></div></div>
+        </div>
+        <div class="sub-block aa-revenue-block">
+          <div class="sub-block-title">販売収益</div>
+          <div class="compact-pair">
+            <div class="compact-metric"><div class="compact-label">販売MQ</div><div class="compact-value">${animatedValue(salesMq,'money')}</div></div>
+            <div class="compact-metric"><div class="compact-label">販売@</div><div class="compact-value">${animatedValue(salesAvg,'money')}</div></div>
+          </div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">翌月管理</div>
+          <div class="compact-metric"><div class="compact-label">翌月納車Q</div><div class="compact-value">${animatedValue(pick(s,['翌月納車Q','翌月納車台数'],0),'number','台')}</div></div>
+        </div>
+      </article>`;
+    }
+    function smallMarketingPanel(s) {
+      return `<article class="panel-card"><div class="panel-head"><div class="panel-title">集客情報</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="panel-number">${fmt(pick(s,KEY.infoQ,0),'number','件')}</div>
+        ${spark('line')}
+      </article>`;
+    }
+    function smallMarketingPanelV2(s,infoQ) {
+      const infoGoal = pick(s,KEY.infoGoal,0);
+      const infoForecast = pick(s,['情報数予想','情報数予想数','情報数着地予想'], infoGoal ? Math.round(num(infoQ) * 1.18) : 0);
+      const fee = pick(s,KEY.infoFee,0);
+      const disclosureRate = pick(s,KEY.disclosureRate,0);
+      const assessmentRate = pick(s,KEY.motaAssessmentRate,0);
+      const contractRate = pick(s,KEY.contractRate,0);
+      const goalMax = Math.max(1,num(infoGoal),num(infoForecast));
+      const disclosureForecast = pick(s,['開示数予想','開示予想数'],0);
+      const assessmentForecast = pick(s,['査定数予想','査定予想数'],0);
+      const contractForecast = pick(s,['成約数予想','成約予想数'],0);
+      const disclosureGoal = pick(s,KEY.disclosureGoal,0);
+      const assessmentGoal = pick(s,KEY.assessmentGoal,0);
+      const contractGoal = pick(s,KEY.contractGoal,0);
+      const infoContractRate = pick(s,['情報成約率'],rate(pick(s,KEY.contractQ,0),infoQ));
+      const disclosureContractRate = pick(s,['開示情報成約率','開示成約率'],rate(pick(s,KEY.contractQ,0),pick(s,KEY.disclosureQ,0)));
+      return `<article class="panel-card home-purchase-card">
+        <div class="panel-head"><div class="panel-title">集客情報</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="purchase-main-block">
+          <div class="mini-title">情報数</div>
+          <div class="metric-row">
+            <div class="metric-main">${animatedValue(infoQ,'number','件')}</div>
+            <div class="trend-chip">▲ ${fmt(pick(s,['情報数前日差','情報前日差'],Math.max(1,Math.round(num(infoQ)*.015))),'number','件')}</div>
+          </div>
+          ${trendSpark()}
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">料金・CVR</div>
+          <div class="grid g2">
+            <div class="compact-metric">
+              <div class="compact-label">情報料金</div>
+              <div class="compact-value">${animatedValue(fee,'money')}</div>
+            </div>
+            <div class="compact-metric">
+              <div class="compact-label">開示率 ${fmt(disclosureRate,'percent')}</div>
+              <div class="bar"><div class="fill" data-width="${pct(disclosureRate)}"></div></div>
+              <div class="compact-label" style="margin-top:8px;">査定率 ${fmt(assessmentRate,'percent')}</div>
+              <div class="bar"><div class="fill blue" data-width="${pct(assessmentRate)}"></div></div>
+              <div class="compact-label" style="margin-top:8px;">成約率 ${fmt(contractRate,'percent')}</div>
+              <div class="bar"><div class="fill green" data-width="${pct(contractRate)}"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">情報数 目標進捗</div>
+          <div class="compact-pair">
+            <div class="compact-metric"><div class="compact-label">目標数</div><div class="compact-value">${animatedValue(infoGoal,'number','件')}</div></div>
+            <div class="compact-metric"><div class="compact-label">予想数</div><div class="compact-value">${animatedValue(infoForecast,'number','件')}</div></div>
+          </div>
+          <div class="ratio-row"><span>目標</span><span>${fmt(infoGoal,'number','件')}</span></div>
+          <div class="bar"><div class="fill black" data-width="${rate(infoGoal,goalMax)*100}"></div></div>
+          <div class="ratio-row"><span>予想</span><span>${fmt(infoForecast,'number','件')}</span></div>
+          <div class="bar"><div class="fill" data-width="${rate(infoForecast,goalMax)*100}"></div></div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">開示・査定・成約 予想比較</div>
+          ${forecastCompareBar('開示',disclosureForecast,disclosureGoal)}
+          ${forecastCompareBar('査定',assessmentForecast,assessmentGoal)}
+          ${forecastCompareBar('成約',contractForecast,contractGoal)}
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">情報成約率</div>
+          <div class="metric-row">
+            <div class="metric-main">${animatedValue(infoContractRate,'percent')}</div>
+            <div class="trend-chip">成約 / 情報数</div>
+          </div>
+          <div class="bar"><div class="fill green" data-width="${pct(infoContractRate)}"></div></div>
+          <div class="ratio-row" style="margin-top:10px;"><span>開示情報成約率</span><span>${fmt(disclosureContractRate,'percent')}</span></div>
+          <div class="bar"><div class="fill blue" data-width="${pct(disclosureContractRate)}"></div></div>
+        </div>
+      </article>`;
+    }
+    function smallTargetPanel(s) {
+      return `<article class="panel-card"><div class="panel-head"><div class="panel-title">目標進捗</div><div class="panel-link">詳細を見る ></div></div>
+        ${targetProgress('MQ',pick(s,KEY.mq,0),pick(s,KEY.mqGoal,0),'money')}
+        ${targetProgress('成約CVR',pick(s,KEY.cvr,0),pick(s,['成約CVR目標','謌千ｴГVR逶ｮ讓・'],0),'percent')}
+      </article>`;
+    }
+    function smallTargetPanelV2(s) {
+      const goalItems = [
+        {label:'G', actual:pick(s,KEY.g,0), goal:pick(s,KEY.gGoal,0), type:'money'},
+        {label:'MQ', actual:pick(s,KEY.mq,0), goal:pick(s,KEY.mqGoal,0), type:'money'},
+        {label:'買取Q', actual:pick(s,KEY.purchaseQ,0), goal:pick(s,KEY.purchaseGoal,0), type:'number', suffix:'台'},
+        {label:'販売Q', actual:pick(s,KEY.salesQ,0), goal:pick(s,KEY.salesGoal,0), type:'number', suffix:'台'},
+        {label:'査定Q', actual:pick(s,KEY.assessmentQ,0), goal:pick(s,KEY.assessmentGoal,0), type:'number', suffix:'台'},
+        {label:'落札MQ', actual:pick(s,KEY.aaMq,0), goal:pick(s,['落札MQ目標','AAMQ目標'],0), type:'money'},
+        {label:'販売総MQ', actual:pick(s,KEY.salesMq,0), goal:pick(s,['販売総MQ目標'],0), type:'money'},
+        {label:'AA@', actual:pick(s,KEY.aaAvg,0), goal:pick(s,['AA@目標','AA＠目標'],0), type:'money'},
+        {label:'納車@', actual:pick(s,['納車@','納車＠'],0), goal:pick(s,['納車@目標','納車＠目標'],0), type:'money'}
+      ];
+      return `<article class="panel-card home-purchase-card">
+        <div class="panel-head"><div class="panel-title">目標進捗</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="sub-block" style="border-top:0;padding-top:0;">
+          <div class="goal-progress-list">
+            ${goalItems.map(item => goalProgressBar(item.label,item.actual,item.goal,item.type,item.suffix || '')).join('')}
+          </div>
+        </div>
+      </article>`;
+    }
+    function smallTargetPanelV3(s, rows) {
+      return `<article class="panel-card home-purchase-card">
+        <div class="panel-head"><div class="panel-title">目標進捗</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="sub-block" style="border-top:0;padding-top:0;">
+          <div class="sub-block-title">目標進捗</div>
+          <div class="goal-progress-list">
+            ${goalProgressBar('G',pick(s,KEY.g,0),pick(s,KEY.gGoal,0),'money')}
+            ${goalProgressBar('MQ',pick(s,KEY.mq,0),pick(s,KEY.mqGoal,0),'money')}
+            ${goalProgressBar('買取Q',pick(s,KEY.purchaseQ,0),pick(s,KEY.purchaseGoal,0),'number','台')}
+            ${goalProgressBar('販売Q',pick(s,KEY.salesQ,0),pick(s,KEY.salesGoal,0),'number','台')}
+            ${goalProgressBar('査定Q',pick(s,KEY.assessmentQ,0),pick(s,KEY.assessmentGoal,0),'number','台')}
+          </div>
+        </div>
+        <div class="sub-block">
+          <div class="sub-block-title">個人ランキング</div>
+          ${homeRankBlock('MQランキング', rows, ['MQ'], 'money')}
+          ${homeRankBlock('買取ランキング', rows, ['買取Q','雋ｷ蜿鵬'], 'number', '台')}
+          ${homeRankBlock('販売ランキング', rows, ['販売Q','雋ｩ螢ｲQ'], 'number', '台')}
+        </div>
+      </article>`;
+    }
+    function smallTargetPanelV4(s, rows) {
+      return `<article class="panel-card home-purchase-card target-compact-card">
+        <div class="panel-head"><div class="panel-title">目標進捗・ランキング</div><div class="panel-link">詳細を見る ></div></div>
+        <div class="target-personal-layout">
+          <div>
+            <div class="sub-block-title">目標進捗</div>
+            <div class="goal-progress-list target-compact-list">
+              ${goalProgressBar('G',pick(s,KEY.g,0),pick(s,KEY.gGoal,0),'money')}
+              ${goalProgressBar('MQ',pick(s,KEY.mq,0),pick(s,KEY.mqGoal,0),'money')}
+              ${goalProgressBar('買取Q',pick(s,KEY.purchaseQ,0),pick(s,KEY.purchaseGoal,0),'number','台')}
+              ${goalProgressBar('販売Q',pick(s,KEY.salesQ,0),pick(s,KEY.salesGoal,0),'number','台')}
+              ${goalProgressBar('落札MQ',pick(s,KEY.aaMq,0),pick(s,['落札MQ目標','AAMQ目標'],0),'money')}
+              ${goalProgressBar('販売総MQ',pick(s,KEY.salesMq,0),pick(s,['販売総MQ目標'],0),'money')}
+              ${goalProgressBar('査定CVR',pick(s,KEY.assessCvr,0),pick(s,['査定CVR目標','査定率目標'],0),'percent')}
+              ${goalProgressBar('成約CVR',pick(s,KEY.cvr,0),pick(s,['成約CVR目標','買取成約CVR目標'],0),'percent')}
+              ${goalProgressBar('AA@',pick(s,KEY.aaAvg,0),pick(s,['AA@目標','AA＠目標'],0),'money')}
+              ${goalProgressBar('納車@',pick(s,['納車@','納車＠'],0),pick(s,['納車@目標','納車＠目標'],0),'money')}
+            </div>
+          </div>
+          <div class="target-ranking-area">
+            <div class="sub-block-title">個人ランキング</div>
+            <div class="target-rank-grid">
+              ${homeRankBlock('MQランキング', rows, ['MQ'], 'money', '', 3)}
+              ${homeRankBlock('買取ランキング', rows, ['買取Q','雋ｷ蜿鵬'], 'number', '台', 3)}
+              ${homeRankBlock('販売ランキング', rows, ['販売Q','雋ｩ螢ｲQ'], 'number', '台', 3)}
+            </div>
+          </div>
+        </div>
+      </article>`;
+    }
+    function detailMetric(label, value, type='number', suffix='台', hot=false, sub='') {
+      return `<div class="detail-metric ${hot ? 'hot' : ''}">
+        <div class="detail-label">${esc(label)}</div>
+        <div class="detail-value ${type === 'money' ? 'small' : ''}">${animatedValue(value,type,suffix)}</div>
+        ${sub ? `<div class="mini-sub">${esc(sub)}</div>` : ''}
+      </div>`;
+    }
+    function detailBlock(title, body, sub='') {
+      return `<section class="detail-block">
+        <div class="detail-block-head">
+          <div class="detail-block-title">${esc(title)}</div>
+          <div class="detail-block-sub">${esc(sub)}</div>
+        </div>
+        <div class="detail-block-body">${body}</div>
+      </section>`;
+    }
+    function detailProgressRow(label, value, mother, suffix='台', color='') {
+      const p = rate(value,mother) * 100;
+      return `<div class="detail-chart-row">
+        <div>${esc(label)}</div>
+        <div class="bar"><div class="fill ${esc(color)}" data-width="${Math.min(100,Math.max(0,p))}"></div></div>
+        <div>${fmt(value,'number',suffix)} / ${p.toFixed(1)}%</div>
+      </div>`;
+    }
+    function detailMoneyProgressRow(label, value, mother, color='') {
+      const p = rate(value,mother) * 100;
+      return `<div class="detail-chart-row">
+        <div>${esc(label)}</div>
+        <div class="bar"><div class="fill ${esc(color)}" data-width="${Math.min(100,Math.max(0,p))}"></div></div>
+        <div>${fmt(value,'money')} / ${p.toFixed(1)}%</div>
+      </div>`;
+    }
+    function timingRow(label, value, ratioValue) {
+      const w = pct(ratioValue);
+      return `<div class="timing-bar-row">
+        <div>${esc(label)}</div>
+        <div class="bar"><div class="fill" data-width="${w}"></div></div>
+        <div class="timing-value">${fmt(value,'number','件')} / ${fmt(ratioValue,'percent')}</div>
+      </div>`;
+    }
+    function purchaseDetailPage(s, assessmentQ, purchaseQ, calendarRows=[]) {
+      const assessCvr = pick(s,['査定CVR','査定率',...(KEY.assessCvr || [])],0);
+      const contractCvr = pick(s,['成約CVR','買取成約CVR',...(KEY.cvr || [])],0);
+      const aaQ = pick(s,['AA','AAQ',...(KEY.aaQ || [])],0);
+      const itemQ = pick(s,['商品','商品Q',...(KEY.itemQ || [])],0);
+      const scrapQ = pick(s,['スクラップ','ｽｸﾗｯﾌﾟ','スクラップQ','ｽｸﾗｯﾌﾟQ',...(KEY.scrapQ || [])],0);
+      const loanerQ = pick(s,['代車','代車Q',...(KEY.loanerQ || [])],0);
+      const immediateContract = pick(s,['即決成約','即決契約','即決契約数',...(KEY.decisionContract || [])],0);
+      const managedContract = pick(s,['管理契約','管理契約数',...(KEY.managedContract || [])],0);
+      const cancelQ = pick(s,['キャンセルQ','キャンセルＱ','買取キャンセルQ',...(KEY.purchaseCancel || [])],0);
+      const avgDays = pick(s,['入庫平均日数'],0);
+      const exhibitQ = pick(s,['出品Q','出品Ｑ','当月AA出品Q',...(KEY.exhibitQ || [])],0);
+      const bidQ = pick(s,['落札Q','落札Ｑ',...(KEY.bidQ || [])],0);
+      const unsoldQ = pick(s,['流札Q','流札Ｑ',...(KEY.unsoldQ || [])],0);
+      const aaCancelQ = pick(s,['取消Q','取消Ｑ',...(KEY.cancelAaQ || [])],0);
+      const unprocessedQ = pick(s,['未処理Q','未処理Ｑ'],0);
+      const carryQ = pick(s,['持越Q','持越Ｑ','持越しQ','持越し台数',...(KEY.carryQ || [])],0);
+      const redQ = pick(s,['赤字Q','赤字Ｑ'],0);
+      const redRate = pick(s,['赤字比率'],rate(redQ,exhibitQ));
+      const aaMq = pick(s,['落札MQ','AAMQ',...(KEY.aaMq || [])],0);
+      const aaAvg = pick(s,['AA@','AA＠',...(KEY.aaAvg || [])],0);
+      const unprocessedMq = pick(s,['未処理MQ'],0);
+      const redLossMoney = pick(s,['赤字金額','AA赤字金額',...(KEY.redLossMoney || [])],0);
+      const routeItems = [
+        {label:'AA', value:aaQ, color:'var(--red)', cls:''},
+        {label:'商品', value:itemQ, color:'#111318', cls:'black'},
+        {label:'スクラップ', value:scrapQ, color:'#546e96', cls:'blue'},
+        {label:'代車', value:loanerQ, color:'#c7ced8', cls:'gray'}
+      ];
+      const aaItems = [
+        {label:'落札Q', value:bidQ, color:'var(--red)', cls:''},
+        {label:'流札Q', value:unsoldQ, color:'#111318', cls:'black'},
+        {label:'取消Q', value:aaCancelQ, color:'#546e96', cls:'blue'},
+        {label:'未処理Q', value:unprocessedQ, color:'#c7ced8', cls:'gray'}
+      ];
+      return `<div class="purchase-detail-page">
+        ${section('買取詳細',`
+          <div class="purchase-detail-hero">
+            ${detailMetric('査定Q',assessmentQ,'number','台',true)}
+            ${detailMetric('買取Q',purchaseQ,'number','台',true)}
+            ${detailMetric('査定CVR',assessCvr,'percent','',true)}
+            ${detailMetric('成約CVR',contractCvr,'percent','',true)}
+          </div>
+        `,'買取実績の主要指標')}
+        <div class="purchase-detail-layout">
+          <div class="purchase-detail-stack">
+            ${detailBlock('買取実績推移',`
+              <div class="metric-row" style="margin-bottom:10px;">
+                <div>
+                  <div class="detail-label">買取Q</div>
+                  <div class="detail-value">${animatedValue(purchaseQ,'number','台')}</div>
+                </div>
+                <div class="trend-chip">査定 ${fmt(assessmentQ,'number','台')} / 成約 ${fmt(contractCvr,'percent')}</div>
+              </div>
+              ${dailyDualLineChart(calendarRows)}
+            `,'日別：買取Q × 査定Q')}
+            ${detailBlock('販路内訳',`
+              ${donutMarkup(routeItems,purchaseQ)}
+              ${detailProgressRow('AA',aaQ,purchaseQ)}
+              ${detailProgressRow('商品',itemQ,purchaseQ,'台','black')}
+              ${detailProgressRow('スクラップ',scrapQ,purchaseQ,'台','blue')}
+              ${detailProgressRow('代車',loanerQ,purchaseQ,'台','gray')}
+            `,'母数：買取Q')}
+            ${detailBlock('査定成約内訳',`
+              <div class="detail-metric-grid g4">
+                ${detailMetric('即決成約',immediateContract,'number','件')}
+                ${detailMetric('管理契約',managedContract,'number','件')}
+                ${detailMetric('キャンセルQ',cancelQ,'number','台')}
+                ${detailMetric('入庫平均日数',avgDays,'days','')}
+              </div>
+              ${detailProgressRow('即決成約',immediateContract,purchaseQ,'件')}
+              ${detailProgressRow('管理契約',managedContract,purchaseQ,'件','blue')}
+              ${detailProgressRow('キャンセルQ',cancelQ,purchaseQ,'台','black')}
+            `,'契約・キャンセル・入庫管理')}
+          </div>
+          <div class="purchase-detail-stack">
+            ${detailBlock('タイミング区分',`
+              <div class="timing-bars">
+                ${timingRow('即日',pick(s,['即日'],0),pick(s,['即日比率'],rate(pick(s,['即日'],0),purchaseQ)))}
+                ${timingRow('過去当日',pick(s,['過去当日'],0),pick(s,['過去当日比率'],rate(pick(s,['過去当日'],0),purchaseQ)))}
+                ${timingRow('過去後日',pick(s,['過去後日'],0),pick(s,['過去後日比率'],rate(pick(s,['過去後日'],0),purchaseQ)))}
+                ${timingRow('後日',pick(s,['後日'],0),pick(s,['後日比率'],rate(pick(s,['後日'],0),purchaseQ)))}
+              </div>
+            `,'査定・成約タイミング')}
+            ${detailBlock('AA詳細',`
+              <div class="aa-wide">
+                ${donutMarkup(aaItems,Math.max(1,num(exhibitQ)))}
+                <div class="detail-metric-grid">
+                  ${detailMetric('出品Q',exhibitQ,'number','台',true)}
+                  ${detailMetric('落札Q',bidQ,'number','台',true)}
+                  ${detailMetric('流札Q',unsoldQ,'number','台')}
+                  ${detailMetric('取消Q',aaCancelQ,'number','台')}
+                  ${detailMetric('未処理Q',unprocessedQ,'number','台')}
+                  ${detailMetric('持越Q',carryQ,'number','台')}
+                  ${detailMetric('赤字Q',redQ,'number','台')}
+                  ${detailMetric('赤字比率',redRate,'percent','')}
+                </div>
+              </div>
+            `,'出品Qを母数に内訳表示')}
+            ${detailBlock('AA収益',`
+              <div class="detail-metric-grid g4">
+                ${detailMetric('落札MQ',aaMq,'money','')}
+                ${detailMetric('AA@',aaAvg,'money','')}
+                ${detailMetric('未処理MQ',unprocessedMq,'money','')}
+                ${detailMetric('赤字金額',redLossMoney,'money','')}
+              </div>
+            `,'収益・赤字管理')}
+          </div>
+        </div>
+      </div>`;
+    }
+    function accessoryCard(label, q, ratioValue, mq) {
+      return `<div class="accessory-card">
+        <div class="accessory-head"><span>${esc(label)}</span><span>${fmt(ratioValue,'percent')}</span></div>
+        <div class="accessory-values"><span>${animatedValue(q,'number','台')}</span><span class="accessory-mq">${animatedValue(mq,'money')}</span></div>
+        <div class="bar" style="margin-top:8px;"><div class="fill" data-width="${pct(ratioValue)}"></div></div>
+      </div>`;
+    }
+    function salesDetailPage(s, salesQ, shipQ, calendarRows=[]) {
+      const stockQ = pick(s,['在庫Q','在庫Ｑ','在庫台数',...(KEY.stockQ || [])],0);
+      const deliveredQ = pick(s,['納車済Q','納車済Ｑ','販売済Q','販売済Ｑ'],0);
+      const listedQ = pick(s,['掲載Q','掲載Ｑ','掲載数',...(KEY.listedQ || [])],0);
+      const unlistedQ = pick(s,['未掲載Q','未掲載Ｑ','未掲載数',...(KEY.unlistedQ || [])],0);
+      const notArrivedQ = pick(s,['未入庫Q','未入庫Ｑ','未入庫台数',...(KEY.notArrivedQ || [])],0);
+      const unacceptedQ = pick(s,['未受入Q','未受入Ｑ',...(KEY.unacceptedQ || [])],0);
+      const dispatchStockQ = pick(s,['配車在庫Q','配車在庫Ｑ','配車在庫数',...(KEY.dispatchStockQ || [])],0);
+      const dispatchQ = pick(s,['配車Q','配車Ｑ','配車台数'],0);
+      const capacityQ = pick(s,['キャパQ','キャパＱ','キャパ台数',...(KEY.capacityQ || [])],0);
+      const capacityRate = pick(s,['キャパ比率','キャパ使用率',...(KEY.capacityRate || [])],rate(dispatchStockQ,capacityQ));
+      const stockMoney = pick(s,['在庫金額',...(KEY.stockMoney || [])],0);
+      const stockAvg = stockQ ? num(stockMoney) / Math.max(1,num(stockQ)) : pick(s,['在庫金額平均',...(KEY.stockAvg || [])],0);
+
+      const undeliveredQ = pick(s,['未納車Q','未納車Ｑ','未納車台数'],0);
+      const nextShipQ = pick(s,['翌月納車Q','翌月納車Ｑ','翌月納車台数'],0);
+      const quickShipQ = pick(s,['即納Q','即納Ｑ'],0);
+      const quickShipRate = pick(s,['即納比率','当月即納比率'],rate(quickShipQ,shipQ));
+      const prevMonthQ = pick(s,['前月Q','前月Ｑ','前月受注納車Q'],0);
+      const prevMonthRate = pick(s,['前月比率','納車Q前月比率'],rate(prevMonthQ,shipQ));
+      const nextMonthQ = pick(s,['翌月Q','翌月Ｑ','翌月受注Q'],0);
+      const nextMonthRate = pick(s,['翌月比率','納車Q翌月比率'],rate(nextMonthQ,shipQ));
+      const turnover = pick(s,['回転数','回転率','回転'],0);
+
+      const deliveredMq = pick(s,['納車済MQ',...(KEY.deliveredMq || [])],0);
+      const undeliveredMq = pick(s,['未納車MQ',...(KEY.undeliveredMq || [])],0);
+      const deliveredKbMq = pick(s,['納車KBMQ'],0);
+      const undeliveredKbMq = pick(s,['未納車KBMQ'],0);
+      const deliveredAccessoryMq = pick(s,['納車付帯MQ'],0);
+      const undeliveredAccessoryMq = pick(s,['未納車付帯MQ'],0);
+      const nextShipMq = pick(s,['翌月納車MQ'],0);
+      const shipAvg = pick(s,['納車@','納車＠'],0);
+      const totalSalesMq = pick(s,['販売総MQ',...(KEY.salesMq || [])],0);
+
+      const inventoryItems = [
+        {label:'在庫Q', value:stockQ, color:'var(--red)', cls:''},
+        {label:'掲載Q', value:listedQ, color:'#111318', cls:'black'},
+        {label:'未掲載Q', value:unlistedQ, color:'#546e96', cls:'blue'},
+        {label:'未入庫Q', value:notArrivedQ, color:'#c7ced8', cls:'gray'}
+      ];
+      const deliveryItems = [
+        {label:'納車台数', value:shipQ, color:'var(--red)', cls:''},
+        {label:'未納車台数', value:undeliveredQ, color:'#111318', cls:'black'},
+        {label:'翌月納車Q', value:nextShipQ, color:'#546e96', cls:'blue'},
+        {label:'即納Q', value:quickShipQ, color:'#c7ced8', cls:'gray'}
+      ];
+      const accessories = [
+        ['クレジット', pick(s,['クレジットQ','ｸﾚｼﾞｯﾄQ','ｸﾚｼﾞｯﾄＱ'],0), pick(s,['クレジット比率','ｸﾚｼﾞｯﾄ比率'],0), pick(s,['クレジットMQ','ｸﾚｼﾞｯﾄMQ'],0)],
+        ['保証', pick(s,['保証Q','保証Ｑ'],0), pick(s,['保証比率'],0), pick(s,['保証MQ'],0)],
+        ['メンテナンス', pick(s,['メンテナンスQ','ﾒﾝﾃﾅﾝｽQ','ﾒﾝﾃﾅﾝｽＱ'],0), pick(s,['メンテナンス比率','ﾒﾝﾃﾅﾝｽ比率'],0), pick(s,['メンテナンスMQ','ﾒﾝﾃﾅﾝｽMQ'],0)],
+        ['クリーニング', pick(s,['クリーニングQ','ｸﾘｰﾆﾝｸﾞQ','ｸﾘｰﾆﾝｸﾞＱ'],0), pick(s,['クリーニング比率','ｸﾘｰﾆﾝｸﾞ比率'],0), pick(s,['クリーニングMQ','ｸﾘｰﾆﾝｸﾞMQ'],0)],
+        ['コーティング', pick(s,['コーティングQ','ｺｰﾃｨﾝｸﾞQ','ｺｰﾃｨﾝｸﾞＱ'],0), pick(s,['コーティング比率','ｺｰﾃｨﾝｸﾞ比率'],0), pick(s,['コーティングMQ','ｺｰﾃｨﾝｸﾞMQ'],0)],
+        ['エアコン', pick(s,['エアコンQ','ｴｱｺﾝQ','ｴｱｺﾝＱ'],0), pick(s,['エアコン比率','ｴｱｺﾝ比率'],0), pick(s,['エアコンMQ','ｴｱｺﾝMQ'],0)],
+        ['楽々納車', pick(s,['楽々納車Q','楽々納車Ｑ'],0), pick(s,['楽々納車比率'],0), pick(s,['楽々納車MQ'],0)],
+        ['タイヤ交換', pick(s,['タイヤ交換Q','タイヤ交換Ｑ'],0), pick(s,['タイヤ交換比率'],0), pick(s,['タイヤ交換MQ'],0)]
+      ];
+      const accessoryMqTotal = accessories.reduce((sum,item) => sum + num(item[3]),0);
+      const accessoryDonut = accessories.map((item,i) => ({
+        label:item[0],
+        value:item[3],
+        color:['var(--red)','#111318','#546e96','#0a8f63','#e0b100','#f17ba0','#7c5cc4','#c7ced8'][i],
+        cls:['','black','blue','','gray','','blue','gray'][i] || ''
+      }));
+      return `<div class="purchase-detail-page">
+        ${section('販売詳細',`
+          <div class="purchase-detail-hero">
+            ${detailMetric('在庫Q',stockQ,'number','台',true)}
+            ${detailMetric('販売Q',salesQ,'number','台',true)}
+            ${detailMetric('納車台数',shipQ,'number','台',true)}
+            ${detailMetric('販売総MQ',totalSalesMq,'money','',true)}
+          </div>
+        `,'販売実績の主要指標')}
+        <div class="purchase-detail-layout">
+          <div class="purchase-detail-stack">
+            ${detailBlock('販売実績推移',`
+              <div class="metric-row" style="margin-bottom:10px;">
+                <div>
+                  <div class="detail-label">販売Q</div>
+                  <div class="detail-value">${animatedValue(salesQ,'number','台')}</div>
+                </div>
+                <div class="trend-chip">配車 ${fmt(dispatchQ,'number','台')} / 納車 ${fmt(shipQ,'number','台')}</div>
+              </div>
+              ${salesDailyDualLineChart(calendarRows)}
+            `,'日別：販売Q × 配車Q')}
+            ${detailBlock('在庫状況',`
+              <div class="sales-wide">
+                ${donutMarkup(inventoryItems,Math.max(1,num(dispatchStockQ)))}
+                <div class="detail-metric-grid">
+                  ${detailMetric('配車在庫Q',dispatchStockQ,'number','台',true)}
+                  ${detailMetric('キャパQ',capacityQ,'number','台')}
+                  ${detailMetric('キャパ比率',capacityRate,'percent','')}
+                  ${detailMetric('在庫金額',stockMoney,'money','',false,`1台平均 ${fmt(stockAvg,'money')}`)}
+                </div>
+              </div>
+              ${detailProgressRow('在庫Q',stockQ,dispatchStockQ)}
+              ${detailProgressRow('掲載Q',listedQ,stockQ,'台','black')}
+              ${detailProgressRow('未掲載Q',unlistedQ,stockQ,'台','blue')}
+              ${detailProgressRow('未入庫Q',notArrivedQ,dispatchStockQ,'台','gray')}
+              ${detailProgressRow('未受入Q',unacceptedQ,stockQ,'台','black')}
+            `,'配車在庫Q・在庫Qを母数に比率表示')}
+            ${detailBlock('受注納車',`
+              <div class="sales-wide">
+                ${donutMarkup(deliveryItems,Math.max(1,num(shipQ)+num(undeliveredQ)+num(nextShipQ)))}
+                <div class="detail-metric-grid">
+                  ${detailMetric('未納車台数',undeliveredQ,'number','台')}
+                  ${detailMetric('翌月納車Q',nextShipQ,'number','台')}
+                  ${detailMetric('即納Q',quickShipQ,'number','台')}
+                  ${detailMetric('回転数',turnover,'number','')}
+                </div>
+              </div>
+              ${detailProgressRow('納車台数',shipQ,num(shipQ)+num(undeliveredQ),'台')}
+              ${detailProgressRow('未納車台数',undeliveredQ,num(shipQ)+num(undeliveredQ),'台','black')}
+              ${detailProgressRow('即納比率',quickShipQ,shipQ,'台','blue')}
+              ${detailProgressRow('前月Q',prevMonthQ,shipQ,'台','gray')}
+              ${detailProgressRow('翌月Q',nextMonthQ,shipQ,'台','black')}
+              <div class="detail-metric-grid g4" style="margin-top:12px;">
+                ${detailMetric('即納比率',quickShipRate,'percent','')}
+                ${detailMetric('前月比率',prevMonthRate,'percent','')}
+                ${detailMetric('翌月比率',nextMonthRate,'percent','')}
+                ${detailMetric('翌月納車Q',nextShipQ,'number','台')}
+              </div>
+            `,'納車・未納車・翌月予定')}
+          </div>
+          <div class="purchase-detail-stack">
+            ${detailBlock('販売収益',`
+              <div class="detail-metric-grid g4">
+                ${detailMetric('納車済MQ',deliveredMq,'money','',true)}
+                ${detailMetric('未納車MQ',undeliveredMq,'money','')}
+                ${detailMetric('納車KBMQ',deliveredKbMq,'money','')}
+                ${detailMetric('未納車KBMQ',undeliveredKbMq,'money','')}
+                ${detailMetric('納車付帯MQ',deliveredAccessoryMq,'money','')}
+                ${detailMetric('未納車付帯MQ',undeliveredAccessoryMq,'money','')}
+                ${detailMetric('翌月納車MQ',nextShipMq,'money','')}
+                ${detailMetric('納車@',shipAvg,'money','')}
+              </div>
+              ${detailMoneyProgressRow('納車済MQ',deliveredMq,totalSalesMq)}
+              ${detailMoneyProgressRow('未納車MQ',undeliveredMq,totalSalesMq,'black')}
+              ${detailMoneyProgressRow('付帯MQ',num(deliveredAccessoryMq)+num(undeliveredAccessoryMq),totalSalesMq,'blue')}
+            `,'販売総MQを母数に収益構成')}
+            ${detailBlock('付帯詳細',`
+              <div class="sales-wide">
+                ${donutMarkup(accessoryDonut,Math.max(1,accessoryMqTotal),'件')}
+                <div>
+                  ${detailMetric('付帯合計MQ',accessoryMqTotal,'money','',true)}
+                  ${detailMoneyProgressRow('付帯MQ構成',accessoryMqTotal,totalSalesMq)}
+                </div>
+              </div>
+              <div class="accessory-grid" style="margin-top:12px;">
+                ${accessories.map(item => accessoryCard(item[0],item[1],item[2],item[3])).join('')}
+              </div>
+            `,'Q・比率・MQを商品別に表示')}
+          </div>
+        </div>
+      </div>`;
+    }
+    function marketingAreaRows(s, rows=[]) {
+      if (rows && rows.length) return rows;
+      return [{
+        'エリア':'選択営業部',
+        '情報数':pick(s,KEY.infoQ,0),
+        '開示数':pick(s,KEY.disclosureQ,0),
+        '査定数':pick(s,KEY.motaAssessmentQ,0),
+        '査定率':pick(s,KEY.motaAssessmentRate,0),
+        '契約数':pick(s,KEY.contractQ,0),
+        '成約率':pick(s,KEY.contractRate,0),
+        '情報成約':pick(s,['情報成約率'],rate(pick(s,KEY.contractQ,0),pick(s,KEY.infoQ,0))),
+        '開示情報成約率':pick(s,['開示情報成約率'],rate(pick(s,KEY.contractQ,0),pick(s,KEY.disclosureQ,0))),
+        '開示率':pick(s,KEY.disclosureRate,0),
+        '情報料金':pick(s,KEY.infoFee,0),
+        '査定CPA':pick(s,['査定CPA'],0),
+        '成約CPA':pick(s,['成約CPA'],0),
+        '一人当たりの情報数':pick(s,['一人当たりの情報数'],rate(pick(s,KEY.infoQ,0),pick(s,KEY.purchaseStaff,0))),
+        '直近層数':pick(s,KEY.near,0),
+        '検討層数':pick(s,KEY.consider,0),
+        '潜在層数':pick(s,KEY.latent,0)
+      }];
+    }
+    function getAreaVal(row, keys) {
+      for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== '') return row[key];
+      }
+      return 0;
+    }
+    function marketingTrendChart(calendarRows, totalInfo) {
+      const rows = (calendarRows || []).filter(row => row && Object.keys(row).length);
+      const points = rows.map((row, i) => {
+        const dateLabel = getRowValue(row,['日付','日','譌･莉・']) || `${i + 1}`;
+        const info = getRowValue(row,['情報数','情報','MOTA情報数','総情報数']) || 0;
+        return { dateLabel, info:num(info) };
+      });
+      const source = points.some(p => p.info) ? points : [
+        {dateLabel:'1', info:Math.round(num(totalInfo)*.12)},
+        {dateLabel:'2', info:Math.round(num(totalInfo)*.28)},
+        {dateLabel:'3', info:Math.round(num(totalInfo)*.46)},
+        {dateLabel:'4', info:Math.round(num(totalInfo)*.60)},
+        {dateLabel:'5', info:Math.round(num(totalInfo)*.78)},
+        {dateLabel:'6', info:num(totalInfo)}
+      ];
+      const w = 560, h = 190, padX = 30, top = 18, bottom = 34;
+      const chartH = h - top - bottom;
+      const maxInfo = Math.max(1,...source.map(p => p.info));
+      const xAt = i => source.length <= 1 ? padX : padX + (i * (w - padX * 2) / (source.length - 1));
+      const yAt = value => top + chartH - (num(value) / maxInfo) * chartH;
+      const path = source.map((p,i) => `${i ? 'L' : 'M'}${xAt(i).toFixed(1)} ${yAt(p.info).toFixed(1)}`).join(' ');
+      const dots = source.map((p,i) => `<circle class="chart-point" data-tooltip="${esc(`${p.dateLabel}\n情報数 ${fmt(p.info,'number','件')}`)}" cx="${xAt(i).toFixed(1)}" cy="${yAt(p.info).toFixed(1)}" r="4.2"></circle>`).join('');
+      const xLabels = source
+        .filter((_,i) => i === 0 || i === source.length - 1 || i % Math.ceil(source.length / 6) === 0)
+        .map((p,i,arr) => {
+          const originalIndex = source.indexOf(p);
+          return `<text x="${xAt(originalIndex).toFixed(1)}" y="${h - 8}" text-anchor="${i === 0 ? 'start' : i === arr.length - 1 ? 'end' : 'middle'}">${esc(String(p.dateLabel).replace(/^0/,''))}</text>`;
+        }).join('');
+      return `<div class="dual-chart-card">
+        <div class="dual-chart-head">
+          <div class="dual-chart-title">日別情報数推移</div>
+          <div class="dual-chart-legend"><span><i class="red-line"></i>情報数 ${fmt(source[source.length - 1]?.info || 0,'number','件')}</span></div>
+        </div>
+        <svg class="dual-line-chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="marketingInfoFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#ef4050" stop-opacity=".22"/>
+              <stop offset="100%" stop-color="#ef4050" stop-opacity=".02"/>
+            </linearGradient>
+          </defs>
+          <g class="grid-lines">
+            <line x1="${padX}" y1="${top}" x2="${w-padX}" y2="${top}"/>
+            <line x1="${padX}" y1="${top + chartH/2}" x2="${w-padX}" y2="${top + chartH/2}"/>
+            <line x1="${padX}" y1="${top + chartH}" x2="${w-padX}" y2="${top + chartH}"/>
+          </g>
+          <path class="dual-area marketing" d="${path} L${xAt(source.length-1).toFixed(1)} ${top+chartH} L${padX} ${top+chartH} Z"/>
+          <path class="dual-line purchase" d="${path}"/>
+          <g class="dual-dots purchase">${dots}</g>
+          <g class="dual-xlabels">${xLabels}</g>
+        </svg>
+      </div>`;
+    }
+    function tripleCompareItem(label, actual, forecast, goal, type='number', suffix='件') {
+      const max = Math.max(1,num(actual),num(forecast),num(goal));
+      const actualRate = rate(actual,goal) * 100;
+      const forecastRate = rate(forecast,goal) * 100;
+      return `<div class="triple-compare-item">
+        <div class="triple-head"><span>${esc(label)}</span><span>実績 ${actualRate.toFixed(1)}% / 予想 ${forecastRate.toFixed(1)}%</span></div>
+        <div class="triple-row"><span>目標</span><div class="bar"><div class="fill black" data-width="${rate(goal,max)*100}"></div></div><span>${fmt(goal,type,suffix)}</span></div>
+        <div class="triple-row"><span>予想</span><div class="bar"><div class="fill blue" data-width="${rate(forecast,max)*100}"></div></div><span>${fmt(forecast,type,suffix)}</span></div>
+        <div class="triple-row"><span>実績</span><div class="bar"><div class="fill" data-width="${rate(actual,max)*100}"></div></div><span>${fmt(actual,type,suffix)}</span></div>
+      </div>`;
+    }
+    function marketingGoalCompareBlock(s, infoQ, disclosureQ, assessmentQ, contractQ) {
+      const infoGoal = pick(s,KEY.infoGoal,0);
+      const disclosureGoal = pick(s,KEY.disclosureGoal,0);
+      const assessmentGoal = pick(s,KEY.assessmentGoal,0);
+      const contractGoal = pick(s,KEY.contractGoal,0);
+      const infoForecast = pick(s,['情報数予想','情報数予想数','情報数着地予想'],0);
+      const disclosureForecast = pick(s,['開示数予想','開示予想数'],0);
+      const assessmentForecast = pick(s,['査定数予想','査定予想数'],0);
+      const contractForecast = pick(s,['成約数予想','契約数予想','成約予想数'],0);
+      return `<div class="triple-compare">
+        ${tripleCompareItem('情報数',infoQ,infoForecast,infoGoal)}
+        ${tripleCompareItem('開示数',disclosureQ,disclosureForecast,disclosureGoal)}
+        ${tripleCompareItem('査定数',assessmentQ,assessmentForecast,assessmentGoal)}
+        ${tripleCompareItem('契約数',contractQ,contractForecast,contractGoal)}
+      </div>`;
+    }
+    function marketingDetailPage(s, infoQ, areaRows=[], calendarRows=[]) {
+      const rows = marketingAreaRows(s, areaRows);
+      const selected = rows.find(row => String(row['エリア'] || '').trim() && !['全体','合計'].includes(String(row['エリア']).trim())) || rows[0] || {};
+      const totalInfo = pick(s,KEY.infoQ,getAreaVal(selected,['情報数']));
+      const disclosureQ = pick(s,KEY.disclosureQ,getAreaVal(selected,['開示数']));
+      const assessmentQ = pick(s,KEY.motaAssessmentQ,getAreaVal(selected,['査定数']));
+      const contractQ = pick(s,KEY.contractQ,getAreaVal(selected,['契約数','成約数']));
+      const assessmentRate = pick(s,KEY.motaAssessmentRate,getAreaVal(selected,['査定率']));
+      const contractRate = pick(s,KEY.contractRate,getAreaVal(selected,['成約率']));
+      const infoContractRate = pick(s,['情報成約率','情報成約'],getAreaVal(selected,['情報成約']));
+      const disclosureContractRate = pick(s,['開示情報成約率'],getAreaVal(selected,['開示情報成約率']));
+      const disclosureRate = pick(s,KEY.disclosureRate,getAreaVal(selected,['開示率']));
+      const infoFee = pick(s,KEY.infoFee,getAreaVal(selected,['情報料金']));
+      const assessmentCpa = pick(s,['査定CPA'],getAreaVal(selected,['査定CPA']));
+      const contractCpa = pick(s,['成約CPA'],getAreaVal(selected,['成約CPA']));
+      const perPersonInfo = pick(s,['一人当たりの情報数'],getAreaVal(selected,['一人当たりの情報数']));
+      const near = pick(s,KEY.near,getAreaVal(selected,['直近層数']));
+      const consider = pick(s,KEY.consider,getAreaVal(selected,['検討層数']));
+      const latent = pick(s,KEY.latent,getAreaVal(selected,['潜在層数']));
+      const prefRows = rows.filter(row => {
+        const label = String(row['エリア'] || '').trim();
+        return label && !['全体','合計'].includes(label);
+      });
+      const prefItems = (prefRows.length ? prefRows : rows).map((row,i) => ({
+        label:String(row['エリア'] || `エリア${i+1}`),
+        value:getAreaVal(row,['情報数']),
+        color:['var(--red)','#111318','#546e96','#0a8f63','#e0b100','#c7ced8'][i % 6],
+        cls:['','black','blue','','gray','gray'][i % 6] || ''
+      }));
+      const tempItems = [
+        {label:'直近層', value:near, color:'var(--red)', cls:''},
+        {label:'検討層', value:consider, color:'#111318', cls:'black'},
+        {label:'潜在層', value:latent, color:'#546e96', cls:'blue'}
+      ];
+      return `<div class="purchase-detail-page">
+        ${section('情報詳細',`
+          <div class="purchase-detail-hero">
+            ${detailMetric('情報数',totalInfo,'number','件',true)}
+            ${detailMetric('開示数',disclosureQ,'number','件',true)}
+            ${detailMetric('査定数',assessmentQ,'number','件',true)}
+            ${detailMetric('契約数',contractQ,'number','件',true)}
+          </div>
+        `,'集客実績の主要指標')}
+        <div class="purchase-detail-layout">
+          <div class="purchase-detail-stack">
+            ${detailBlock('情報数推移',marketingTrendChart(calendarRows,totalInfo),'日別折れ線')}
+            ${detailBlock('目標・予想・実績比較',`
+              ${marketingGoalCompareBlock(s,totalInfo,disclosureQ,assessmentQ,contractQ)}
+            `,'黒：目標 / 紺：予想 / 赤：実績')}
+            ${detailBlock('CVR詳細',`
+              ${detailProgressRow('開示率',disclosureQ,totalInfo,'件')}
+              ${detailProgressRow('査定率',assessmentQ,disclosureQ,'件','blue')}
+              ${detailProgressRow('成約率',contractQ,assessmentQ,'件','black')}
+              <div class="detail-metric-grid g4" style="margin-top:12px;">
+                ${detailMetric('査定率',assessmentRate,'percent','')}
+                ${detailMetric('成約率',contractRate,'percent','')}
+                ${detailMetric('情報成約',infoContractRate,'percent','')}
+                ${detailMetric('開示情報成約率',disclosureContractRate,'percent','')}
+              </div>
+            `,'開示・査定・契約の率')}
+          </div>
+          <div class="purchase-detail-stack">
+            ${detailBlock('料金・CPA',`
+              <div class="detail-metric-grid g4">
+                ${detailMetric('情報料金',infoFee,'money','',true)}
+                ${detailMetric('査定CPA',assessmentCpa,'money','')}
+                ${detailMetric('成約CPA',contractCpa,'money','')}
+                ${detailMetric('一人当たり情報数',perPersonInfo,'number','件')}
+              </div>
+              ${detailMoneyProgressRow('査定CPA',assessmentCpa,Math.max(1,num(contractCpa)),'blue')}
+              ${detailMoneyProgressRow('成約CPA',contractCpa,Math.max(1,num(contractCpa)),'black')}
+            `,'費用効率')}
+            ${detailBlock('温度別詳細',`
+              ${donutMarkup(tempItems,Math.max(1,num(near)+num(consider)+num(latent)),'件')}
+              ${detailProgressRow('直近層',near,num(near)+num(consider)+num(latent),'件')}
+              ${detailProgressRow('検討層',consider,num(near)+num(consider)+num(latent),'件','black')}
+              ${detailProgressRow('潜在層',latent,num(near)+num(consider)+num(latent),'件','blue')}
+            `,'顧客温度の構成')}
+            ${detailBlock('都道府県別一覧',`
+              <div class="table-wrap"><table><thead><tr><th>エリア</th><th>情報数</th><th>開示数</th><th>査定数</th><th>契約数</th><th>成約率</th></tr></thead>
+              <tbody>${rows.map(row => `<tr>
+                <td>${esc(row['エリア'] || '-')}</td>
+                <td>${fmt(getAreaVal(row,['情報数']),'number','件')}</td>
+                <td>${fmt(getAreaVal(row,['開示数']),'number','件')}</td>
+                <td>${fmt(getAreaVal(row,['査定数']),'number','件')}</td>
+                <td>${fmt(getAreaVal(row,['契約数','成約数']),'number','件')}</td>
+                <td>${fmt(getAreaVal(row,['成約率']),'percent')}</td>
+              </tr>`).join('')}</tbody></table></div>
+            `,'取得したエリア行')}
+            ${detailBlock('都道府県比率',`
+              ${donutMarkup(prefItems,Math.max(1,prefItems.reduce((sum,item)=>sum+num(item.value),0)))}
+              ${prefItems.map(item => detailProgressRow(item.label,item.value,prefItems.reduce((sum,row)=>sum+num(row.value),0),'件',item.cls)).join('')}
+            `,'情報数を母数に構成比')}
+          </div>
+        </div>
+      </div>`;
+    }
+    function profileRow(label, value) {
+      return `<div class="profile-row"><div class="profile-label">${esc(label)}</div><div class="profile-value">${esc(value === '' || value === undefined || value === null ? '-' : value)}</div></div>`;
+    }
+    function basicInfoPage(data, s) {
+      const dept = data.selectedDept || pick(s,KEY.dept,'-');
+      const area = pick(s,['管轄エリア','エリア','営業エリア','担当エリア'],dept);
+      const bases = pick(s,KEY.base,0);
+      const baseList = pick(s,['所属拠点一覧','拠点一覧','店舗一覧','所属拠点','管轄拠点'],'-');
+      const leader = pick(s,['営業部責任者','責任者名','営業部TOP','TOP名','部長','責任者'],'-');
+      const targetMonth = data.targetMonth || pick(s,KEY.targetMonth,'-');
+      const updatedAt = data.updatedAt || pick(s,KEY.updatedAt,'-');
+      const staff = pick(s,KEY.staff,0);
+      const manager = pick(s,KEY.manager,0);
+      const mg = pick(s,['MG人数','MG','MGA人数'],0);
+      const purchaseStaff = pick(s,KEY.purchaseStaff,0);
+      const salesStaff = pick(s,KEY.salesStaff,0);
+      const office = pick(s,['事務人数','事務'],0);
+      const purchaseRatio = rate(purchaseStaff,staff);
+      const salesRatio = rate(salesStaff,staff);
+      const perBase = num(bases) ? num(staff) / num(bases) : 0;
+      const perInfo = num(staff) ? num(pick(s,KEY.infoQ,0)) / num(staff) : 0;
+      const perPurchase = num(staff) ? num(pick(s,KEY.purchaseQ,0)) / num(staff) : 0;
+      const perSales = num(staff) ? num(pick(s,KEY.salesQ,0)) / num(staff) : 0;
+      const cRank = pick(s,['Cランク以上人数','Cランク以上','Aランク人数','Bランク人数'],0);
+      const rookie = pick(s,['新人人数','新人','Eランク新人','Eランク人数'],0);
+      const staffItems = [
+        {label:'責任者', value:manager, color:'var(--red)', cls:''},
+        {label:'MG', value:mg, color:'#111318', cls:'black'},
+        {label:'買取営業', value:purchaseStaff, color:'#546e96', cls:'blue'},
+        {label:'販売営業', value:salesStaff, color:'#0a8f63', cls:''},
+        {label:'事務', value:office, color:'#c7ced8', cls:'gray'}
+      ];
+      const maxProductivity = Math.max(1,perBase,perInfo,perPurchase,perSales);
+      return `<div class="purchase-detail-page">
+        ${section('基本情報',`
+          <div class="basic-hero">
+            ${detailBlock('営業部プロフィール',`
+              <div class="profile-list">
+                ${profileRow('営業部名',dept)}
+                ${profileRow('管轄エリア',area)}
+                ${profileRow('拠点数',`${fmt(bases,'number','拠点')}`)}
+                ${profileRow('所属拠点一覧',baseList)}
+                ${profileRow('営業部責任者',leader)}
+                ${profileRow('対象月',targetMonth)}
+                ${profileRow('更新日時',updatedAt)}
+              </div>
+            `,'営業部の基本情報')}
+            ${detailBlock('人員構成',`
+              ${donutMarkup(staffItems,Math.max(1,num(staff)),'名')}
+              <div class="detail-metric-grid g4" style="margin-top:12px;">
+                ${detailMetric('スタッフ人数',staff,'number','名',true)}
+                ${detailMetric('責任者人数',manager,'number','名')}
+                ${detailMetric('MG人数',mg,'number','名')}
+                ${detailMetric('事務人数',office,'number','名')}
+              </div>
+              ${detailProgressRow('買取営業比率',purchaseStaff,staff,'名','blue')}
+              ${detailProgressRow('販売営業比率',salesStaff,staff,'名')}
+            `,'人数と職種比率')}
+          </div>
+        `,'営業部プロフィール・人員・稼働体制')}
+        <div class="purchase-detail-layout">
+          <div class="purchase-detail-stack">
+            ${detailBlock('人員詳細',`
+              <div class="detail-metric-grid g4">
+                ${detailMetric('買取営業人数',purchaseStaff,'number','名',true)}
+                ${detailMetric('販売営業人数',salesStaff,'number','名',true)}
+                ${detailMetric('Cランク以上人数',cRank,'number','名')}
+                ${detailMetric('新人人数',rookie,'number','名')}
+              </div>
+              ${detailProgressRow('Cランク以上比率',cRank,staff,'名','blue')}
+              ${detailProgressRow('新人比率',rookie,staff,'名','black')}
+            `,'ランク・新人構成')}
+          </div>
+          <div class="purchase-detail-stack">
+            ${detailBlock('稼働・体制指標',`
+              <div class="productivity-grid">
+                ${detailMetric('1拠点あたり人数',perBase,'number','名')}
+                ${detailMetric('1人あたり情報数',perInfo,'number','件')}
+                ${detailMetric('1人あたり買取Q',perPurchase,'number','台')}
+                ${detailMetric('1人あたり販売Q',perSales,'number','台')}
+              </div>
+              <div style="margin-top:12px;">
+                ${detailProgressRow('1拠点あたり人数',perBase,maxProductivity,'名')}
+                ${detailProgressRow('1人あたり情報数',perInfo,maxProductivity,'件','blue')}
+                ${detailProgressRow('1人あたり買取Q',perPurchase,maxProductivity,'台','black')}
+                ${detailProgressRow('1人あたり販売Q',perSales,maxProductivity,'台')}
+              </div>
+            `,'人数に対する生産性')}
+          </div>
+        </div>
+      </div>`;
+    }
+    function targetState(rateValue) {
+      const p = num(rateValue);
+      if (p >= 120) return {label:'GREAT', cls:'great'};
+      if (p >= 100) return {label:'NICE', cls:'nice'};
+      if (p < 70) return {label:'CATASTROPHE', cls:'catastrophe'};
+      if (p < 80) return {label:'DANGER', cls:'danger'};
+      return {label:'WATCH', cls:'danger'};
+    }
+    function targetKpiRows(s) {
+      return [
+        {label:'G', actual:pick(s,KEY.g,0), goal:pick(s,KEY.gGoal,0), forecast:pick(s,['G予想','G予想実績'],0), type:'money'},
+        {label:'MQ', actual:pick(s,KEY.mq,0), goal:pick(s,KEY.mqGoal,0), forecast:pick(s,['MQ予想','MQ予想実績'],0), type:'money'},
+        {label:'買取Q', actual:pick(s,KEY.purchaseQ,0), goal:pick(s,KEY.purchaseGoal,0), forecast:pick(s,['買取Q予想','買取Q予想実績'],0), type:'number', suffix:'台'},
+        {label:'販売Q', actual:pick(s,KEY.salesQ,0), goal:pick(s,KEY.salesGoal,0), forecast:pick(s,['販売Q予想','販売Q予想実績'],0), type:'number', suffix:'台'},
+        {label:'査定Q', actual:pick(s,KEY.assessmentQ,0), goal:pick(s,KEY.assessmentGoal,0), forecast:pick(s,['査定Q予想','査定Q予想実績'],0), type:'number', suffix:'台'},
+        {label:'情報数', actual:pick(s,KEY.infoQ,0), goal:pick(s,KEY.infoGoal,0), forecast:pick(s,['情報数予想','情報数予想数'],0), type:'number', suffix:'件'},
+        {label:'開示数', actual:pick(s,KEY.disclosureQ,0), goal:pick(s,KEY.disclosureGoal,0), forecast:pick(s,['開示数予想','開示予想数'],0), type:'number', suffix:'件'},
+        {label:'契約数', actual:pick(s,KEY.contractQ,0), goal:pick(s,KEY.contractGoal,0), forecast:pick(s,['契約数予想','成約数予想','成約予想数'],0), type:'number', suffix:'件'},
+        {label:'落札MQ', actual:pick(s,KEY.aaMq,0), goal:pick(s,['落札MQ目標','AAMQ目標'],0), forecast:pick(s,['落札MQ予想'],0), type:'money'},
+        {label:'販売総MQ', actual:pick(s,KEY.salesMq,0), goal:pick(s,['販売総MQ目標'],0), forecast:pick(s,['販売総MQ予想'],0), type:'money'},
+        {label:'AA@', actual:pick(s,KEY.aaAvg,0), goal:pick(s,['AA@目標','AA＠目標'],0), forecast:0, type:'money'},
+        {label:'納車@', actual:pick(s,['納車@','納車＠'],0), goal:pick(s,['納車@目標','納車＠目標'],0), forecast:0, type:'money'}
+      ];
+    }
+    function targetManagePage(s) {
+      const rows = targetKpiRows(s);
+      const riskRows = rows.map(row => {
+        const basis = num(row.forecast) || num(row.actual);
+        const percent = rate(basis,row.goal) * 100;
+        return {...row, percent, state:targetState(percent)};
+      }).sort((a,b) => a.percent - b.percent);
+      const alertItems = riskRows.slice(0,4);
+      return `<div class="purchase-detail-page">
+        ${section('目標管理',`
+          <div class="alert-grid">
+            ${alertItems.map(row => `<div class="alert-card ${row.state.cls}">
+              <div class="alert-label">${esc(row.state.label)} / ${esc(row.label)}</div>
+              <div class="alert-value">${row.percent.toFixed(1)}%</div>
+              <div class="mini-sub">予想または実績 ${fmt(num(row.forecast)||num(row.actual),row.type,row.suffix||'')} / 目標 ${fmt(row.goal,row.type,row.suffix||'')}</div>
+            </div>`).join('')}
+          </div>
+        `,'危険KPIアラート')}
+        ${detailBlock('目標・予想・実績',`
+          <div class="target-detail-grid">
+            ${rows.map(row => tripleCompareItem(row.label,row.actual,row.forecast,row.goal,row.type,row.suffix||'')).join('')}
+          </div>
+        `,'黒：目標 / 紺：予想 / 赤：実績')}
+        ${detailBlock('差分管理',`
+          <div class="table-wrap"><table><thead><tr><th>KPI</th><th>目標差分</th><th>予想差分</th><th>必要残</th><th>現在進捗</th></tr></thead>
+          <tbody>${rows.map(row => {
+            const actual = num(row.actual);
+            const goal = num(row.goal);
+            const forecast = num(row.forecast);
+            return `<tr><td>${esc(row.label)}</td><td>${fmt(actual-goal,row.type,row.suffix||'')}</td><td>${fmt((forecast||actual)-goal,row.type,row.suffix||'')}</td><td>${fmt(Math.max(0,goal-actual),row.type,row.suffix||'')}</td><td>${(rate(actual,goal)*100).toFixed(1)}%</td></tr>`;
+          }).join('')}</tbody></table></div>
+        `,'目標との差分・残必要数')}
+      </div>`;
+    }
+    function personalValue(row, keys) {
+      return getRowValue(row,keys);
+    }
+    function roleBadgeClass(role) {
+      const text = String(role || '');
+      if (!text) return '';
+      if (text.includes('責任者')) return 'manager';
+      if (text.includes('買取')) return 'purchase';
+      if (text.includes('販売')) return 'sales';
+      return '';
+    }
+    function personalProfileCell(row) {
+      const name = personalValue(row,['氏名','名前','スタッフ名']) || '-';
+      const base = personalValue(row,['拠点','所属拠点','店舗']) || '-';
+      const rank = personalValue(row,['ランク']) || '-';
+      const role = personalValue(row,['役職','職位','肩書']) || '';
+      const badge = role ? `<span class="role-badge ${roleBadgeClass(role)}">${esc(role)}</span>` : '';
+      return `<div class="personal-name">${esc(name)}<div class="personal-meta"><span class="personal-meta-text">${esc(base)} / ${esc(rank)}</span>${badge}</div></div>`;
+    }
+    function personalManagePage(rows=[]) {
+      const people = rows || [];
+      return `<div class="purchase-detail-page">
+        ${section('個人実績',`
+          <div class="personal-card-grid">
+            ${ranking('MQランキング',people,['MQ'],'money')}
+            ${ranking('買取Qランキング',people,['買取Q','雋ｷ蜿鵬'],'number','台')}
+            ${ranking('販売Qランキング',people,['販売Q','雋ｩ螢ｲQ'],'number','台')}
+          </div>
+        `,'ランキング上位')}
+        ${detailBlock('個人別KPI比較',`
+          <div class="personal-kpi-list">
+            ${people.map((row,i) => `<div class="personal-kpi-row">
+              <span class="rank-badge ${i===0?'top':i===1?'second':i===2?'third':''}">${i+1}</span>
+              ${personalProfileCell(row)}
+              <div>MQ<br>${fmt(personalValue(row,['MQ']),'money')}</div>
+              <div>査定Q<br>${fmt(personalValue(row,['査定Q','査定数']),'number','台')}</div>
+              <div>買取Q<br>${fmt(personalValue(row,['買取Q','雋ｷ蜿鵬']),'number','台')}</div>
+              <div>販売Q<br>${fmt(personalValue(row,['販売Q','雋ｩ螢ｲQ']),'number','台')}</div>
+              <div>予約数<br>${fmt(personalValue(row,['予約数']),'number','件')}</div>
+              <div>成約CVR<br>${fmt(personalValue(row,['成約CVR','成約率']),'percent')}</div>
+            </div>`).join('') || '<div class="status">個人実績データがありません。</div>'}
+          </div>
+        `,'ランキングだけでなく育成視点で比較')}
+        ${detailBlock('育成・偏り確認',`
+          <div class="detail-metric-grid g4">
+            ${detailMetric('高成約率人数',people.filter(r => pct(personalValue(r,['成約CVR','成約率'])) >= 45).length,'number','名')}
+            ${detailMetric('買取Q上位人数',people.filter(r => num(personalValue(r,['買取Q','雋ｷ蜿鵬'])) >= 10).length,'number','名')}
+            ${detailMetric('販売Q上位人数',people.filter(r => num(personalValue(r,['販売Q','雋ｩ螢ｲQ'])) >= 3).length,'number','名')}
+            ${detailMetric('確認対象人数',people.filter(r => pct(personalValue(r,['成約CVR','成約率'])) < 30).length,'number','名')}
+          </div>
+        `,'強み・育成候補を抽出')}
+      </div>`;
+    }
+    function calendarMetric(row, keys) {
+      return getRowValue(row,keys) || 0;
+    }
+    function calendarManagePage(calendarRows=[], s={}) {
+      const rows = calendarRows || [];
+      const now = new Date();
+      const totalDays = rows.length || new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+      const elapsed = Math.min(totalDays, now.getDate());
+      const remain = Math.max(0,totalDays-elapsed);
+      const purchaseTotal = rows.reduce((sum,r)=>sum+num(calendarMetric(r,['買取Q','買取','契約'])),0) || num(pick(s,KEY.purchaseQ,0));
+      const salesTotal = rows.reduce((sum,r)=>sum+num(calendarMetric(r,['販売Q','販売','受注'])),0) || num(pick(s,KEY.salesQ,0));
+      const infoTotal = rows.reduce((sum,r)=>sum+num(calendarMetric(r,['情報数','情報'])),0) || num(pick(s,KEY.infoQ,0));
+      const todayRow = rows.find(r => String(calendarMetric(r,['日付','日'])).includes(`/${now.getDate()}`)) || rows[elapsed-1] || {};
+      const timeline = rows.map((row,i) => {
+        const date = String(calendarMetric(row,['日付','日']) || `${now.getMonth()+1}/${i+1}`);
+        const weekday = calendarMetric(row,['曜日']) || ['日','月','火','水','木','金','土'][new Date(now.getFullYear(), now.getMonth(), i+1).getDay()];
+        const cls = weekday === '土' ? ' sat' : weekday === '日' ? ' sun' : '';
+        const todayCls = i + 1 === now.getDate() ? ' today' : '';
+        return `<div class="calendar-timeline-row${cls}${todayCls}">
+          <div>${esc(date)}</div><div>${esc(weekday)}</div>
+          <div>買取 ${fmt(calendarMetric(row,['買取Q','買取','契約']),'number','台')}</div>
+          <div>査定 ${fmt(calendarMetric(row,['査定Q','査定','査定数']),'number','台')}</div>
+          <div>販売 ${fmt(calendarMetric(row,['販売Q','販売','受注']),'number','台')}</div>
+          <div>情報 ${fmt(calendarMetric(row,['情報数','情報']),'number','件')}</div>
+          <div>成約 ${fmt(calendarMetric(row,['成約CVR','成約率']),'percent')}</div>
+        </div>`;
+      }).join('');
+      return `<div class="purchase-detail-page">
+        ${section('カレンダー',`
+          <div class="calendar-summary-grid">
+            ${detailMetric('経過日数',elapsed,'number','日')}
+            ${detailMetric('残日数',remain,'number','日')}
+            ${detailMetric('営業日数',totalDays,'number','日')}
+            ${detailMetric('今日の買取Q',calendarMetric(todayRow,['買取Q','買取','契約']),'number','台')}
+            ${detailMetric('今月買取Q',purchaseTotal,'number','台')}
+            ${detailMetric('着地予測',elapsed ? Math.round(purchaseTotal / elapsed * totalDays) : 0,'number','台')}
+          </div>
+        `,'月間状況')}
+        ${detailBlock('日別タイムライン',`
+          <div class="calendar-timeline">${timeline || '<div class="status">日別データがありません。</div>'}</div>
+        `,'土曜は水色 / 日曜祝日はピンク / 当日は赤枠')}
+        ${detailBlock('日別グラフ',`
+          <div class="calendar-mini-grid">
+            ${dailyDualLineChart(rows)}
+            ${salesDailyDualLineChart(rows)}
+            ${marketingTrendChart(rows,infoTotal)}
+            ${detailBlock('月間累計',`
+              ${detailProgressRow('買取Q',purchaseTotal,pick(s,KEY.purchaseGoal,0),'台')}
+              ${detailProgressRow('販売Q',salesTotal,pick(s,KEY.salesGoal,0),'台','blue')}
+              ${detailProgressRow('情報数',infoTotal,pick(s,KEY.infoGoal,0),'件','black')}
+            `,'目標比較')}
+          </div>
+        `,'日ごとの波を確認')}
+      </div>`;
+    }
+    function rawDataTable(s,fieldMeta) {
+      const rows = Object.entries(s).map(([k,v],i) => {
+        const meta = fieldMeta[k] || {};
+        return `<tr><td>${i+1}</td><td>${esc(k)}</td><td>${esc(meta.trigger || '-')}</td><td>${esc(meta.page || '-')}</td><td>${esc(v === '' ? 0 : v)}</td></tr>`;
+      }).join('');
+      return `<div class="table-wrap"><table><thead><tr><th>No</th><th>取得キー</th><th>取得トリガー</th><th>表示ページ</th><th>値</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    function switchView(view) {
+      ['home','basic','purchase','sales','marketing','target','personal','calendar','settings'].forEach(name => {
+        document.getElementById(`view-${name}`)?.classList.toggle('active', name === view);
+        document.getElementById(`menu-${name}`)?.classList.toggle('active', name === view);
+      });
+      runBars();
+    }
+    function runBars() {
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.fill,.seg,.goal-progress-fill').forEach(el => {
+          const w = Number(el.dataset.width || 0);
+          el.style.width = '0%';
+          requestAnimationFrame(() => {
+            el.style.width = `${Math.max(0,Math.min(100,w))}%`;
+          });
+        });
+        document.querySelectorAll('.donut').forEach(el => {
+          el.style.animation = 'none';
+          void el.offsetWidth;
+          el.style.animation = '';
+        });
+        document.querySelectorAll('.spark path[stroke],.trend-spark path[stroke]').forEach(el => {
+          el.style.animation = 'none';
+          void el.getBoundingClientRect();
+          el.style.animation = '';
+        });
+        document.querySelectorAll('.spark path[fill],.trend-spark path[fill]').forEach(el => {
+          el.style.animation = 'none';
+          void el.getBoundingClientRect();
+          el.style.animation = '';
+        });
+      });
+      animateNumbers();
+      initChartTooltips();
+    }
+    function initChartTooltips() {
+      if (window.__tjChartTooltipReady) return;
+      window.__tjChartTooltipReady = true;
+      const tooltip = document.createElement('div');
+      tooltip.className = 'chart-tooltip';
+      document.body.appendChild(tooltip);
+      document.addEventListener('pointermove', event => {
+        const point = event.target.closest ? event.target.closest('.chart-point') : null;
+        if (!point) {
+          tooltip.style.display = 'none';
+          return;
+        }
+        tooltip.textContent = point.dataset.tooltip || '';
+        tooltip.style.left = `${event.clientX}px`;
+        tooltip.style.top = `${event.clientY}px`;
+        tooltip.style.display = 'block';
+      });
+      document.addEventListener('pointerleave', () => {
+        tooltip.style.display = 'none';
+      });
+    }
+    function animateNumbers() {
+      const nodes = document.querySelectorAll('.view.active .count-up');
+      nodes.forEach(el => {
+        const raw = el.dataset.value || 0;
+        const type = el.dataset.type || 'number';
+        const suffix = el.dataset.suffix || '';
+        const target = num(raw);
+        const start = performance.now();
+        const duration = 820;
+        function tick(now) {
+          const p = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - p, 3);
+          const current = target * eased;
+          el.textContent = fmt(type === 'percent' ? current : current, type, suffix);
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = fmt(raw, type, suffix);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+    async function init() {
+      try {
+        const options = await runGas('getSalesOsDeptOptions');
+        const select = document.getElementById('deptSelect');
+        select.innerHTML = (options || []).map(name => `<option>${esc(name)}</option>`).join('');
+        if (!options || !options.length) {
+          setStatus('参照設定に有効な営業部がありません。', true);
+          return;
+        }
+        select.value = options.includes('千葉営業部') ? '千葉営業部' : options[0];
+        await loadDashboard();
+      } catch (error) {
+        setStatus(error.message || String(error), true);
+      }
+    }
+    async function loadDashboard() {
+      try {
+        const dept = document.getElementById('deptSelect').value;
+        setStatus(`${dept} のリンクOSを読み込んでいます...`);
+        const data = await runGas('getSalesOsDashboardByDept', [dept]);
+        renderDashboard(data);
+        setStatus(`${dept} を表示しています。`);
+      } catch (error) {
+        setStatus(error.message || String(error), true);
+      }
+    }
+    init();
+  </script>
+</body>
+</html>
